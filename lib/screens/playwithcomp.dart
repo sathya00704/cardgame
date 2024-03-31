@@ -1,4 +1,3 @@
-/*
 import 'package:flutter/material.dart';
 import 'package:cardgame/models/cards.dart';
 import 'dart:math';
@@ -14,315 +13,12 @@ class _PlaywithCompState extends State<PlaywithComp> {
   List<PlayingCard> player2 = [];
   List<PlayingCard> player3 = [];
   List<PlayingCard> player4 = [];
+  List<List<PlayingCard>> p1_s = [];
+  List<List<PlayingCard>> p2_s = [];
+  List<List<PlayingCard>> p3_s = [];
+  List<List<PlayingCard>> p4_s = [];
   List<PlayingCard> throwCards = [];
-
-  @override
-  void initState() {
-    super.initState();
-    // Generate 13 unique open cards
-    openCards = generateUniqueOpenCards();
-    // Shuffle the cards
-    openCards.shuffle();
-
-    // Distribute cards among players
-    distributeCards();
-  }
-
-  List<PlayingCard> generateUniqueOpenCards() {
-    List<PlayingCard> uniqueCards = [];
-    Random random = Random();
-    Set<String> generatedCards = Set();
-
-
-    while (uniqueCards.length < 52) {
-      CardSuit randomSuit = CardSuit.values[random.nextInt(CardSuit.values.length)];
-      CardType randomType = CardType.values[random.nextInt(CardType.values.length)];
-      String cardKey = '$randomSuit-$randomType';
-
-      if (!generatedCards.contains(cardKey)) {
-        uniqueCards.add(PlayingCard(cardSuit: randomSuit, cardType: randomType, faceUp: true, opened: true));
-        generatedCards.add(cardKey);
-      }
-    }
-    print('generatedCards = $generatedCards');
-
-    return uniqueCards;
-  }
-
-  void gameLogic(PlayingCard card){
-    String h = card.printCardInfo(card);
-    print('CARD on top for player 1 = $h');
-  }
-
-  void enableonlySuit(PlayingCard card){
-    String h = card.printCardInfo(card);
-    print('CARD on top for player 1 = $h');
-  }
-
-  void findSimilarSuitCard(List<PlayingCard> player1, List<PlayingCard> player2, List<PlayingCard> player3, List<PlayingCard> player4) {
-    List<List<PlayingCard>> p1_s = List.generate(4, (_) => []);
-    List<List<PlayingCard>> p2_s = List.generate(4, (_) => []);
-    List<List<PlayingCard>> p3_s = List.generate(4, (_) => []);
-    List<List<PlayingCard>> p4_s = List.generate(4, (_) => []);
-
-
-    for (PlayingCard card in player1) {
-      switch (card.cardSuit) {
-        case CardSuit.spades:
-          p1_s[0].add(card);
-          break;
-        case CardSuit.hearts:
-          p1_s[1].add(card);
-          break;
-        case CardSuit.diamonds:
-          p1_s[2].add(card);
-          break;
-        case CardSuit.clubs:
-          p1_s[3].add(card);
-          break;
-      }
-    }
-
-    for (PlayingCard card in player2) {
-      switch (card.cardSuit) {
-        case CardSuit.spades:
-          p2_s[0].add(card);
-          break;
-        case CardSuit.hearts:
-          p2_s[1].add(card);
-          break;
-        case CardSuit.diamonds:
-          p2_s[2].add(card);
-          break;
-        case CardSuit.clubs:
-          p2_s[3].add(card);
-          break;
-      }
-    }
-
-    for (PlayingCard card in player3) {
-      switch (card.cardSuit) {
-        case CardSuit.spades:
-          p3_s[0].add(card);
-          break;
-        case CardSuit.hearts:
-          p3_s[1].add(card);
-          break;
-        case CardSuit.diamonds:
-          p3_s[2].add(card);
-          break;
-        case CardSuit.clubs:
-          p3_s[3].add(card);
-          break;
-      }
-    }
-
-    for (PlayingCard card in player4) {
-      switch (card.cardSuit) {
-        case CardSuit.spades:
-          p4_s[0].add(card);
-          break;
-        case CardSuit.hearts:
-          p4_s[1].add(card);
-          break;
-        case CardSuit.diamonds:
-          p4_s[2].add(card);
-          break;
-        case CardSuit.clubs:
-          p4_s[3].add(card);
-          break;
-      }
-    }
-
-    // Print the segregated cards for player 1
-    print('Segregated cards for player 1:');
-    for (int i = 0; i < p1_s.length; i++) {
-      List<String> cardNames = p1_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-      print("Suit ${i + 1}: $cardNames");
-    }
-
-    print('Segregated cards for player 2:');
-    for (int i = 0; i < p2_s.length; i++) {
-      List<String> cardNames = p2_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-      print("Suit ${i + 1}: $cardNames");
-    }
-
-    print('Segregated cards for player 3:');
-    for (int i = 0; i < p3_s.length; i++) {
-      List<String> cardNames = p3_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-      print("Suit ${i + 1}: $cardNames");
-    }
-
-    print('Segregated cards for player 4:');
-    for (int i = 0; i < p4_s.length; i++) {
-      List<String> cardNames = p4_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-      print("Suit ${i + 1}: $cardNames");
-    }
-
-    // Now you have segregated arrays for each player and each suit
-    // You can use these arrays as needed
-  }
-
-
-  void distributeCards() {
-    int cardsPerPlayer = 13;
-    player1 = openCards.sublist(0, cardsPerPlayer);
-    player2 = openCards.sublist(cardsPerPlayer, cardsPerPlayer * 2);
-    player3 = openCards.sublist(cardsPerPlayer * 2, cardsPerPlayer * 3);
-    player4 = openCards.sublist(cardsPerPlayer * 3);
-    throwCards = [player1[0], player2[0], player3[0], player4[0]];
-    print('player[0]=${player1[0]}');
-    gameLogic(player1[0]);
-    findSimilarSuitCard(player1, player2, player3, player4);
-
-    printPlayerCards(player2, "Player 2");
-    printPlayerCards(player3, "Player 3");
-    printPlayerCards(player4, "Player 4");
-  }
-
-  void printPlayerCards(List<PlayingCard> cards, String playerName) {
-    List<String> cardNames = cards.map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-    print("$playerName: $cardNames");
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.green,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 7,
-              ),
-              itemCount: player1.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    PlayingCard tappedCard = player1[index];
-                    setState(() {
-                      throwCards[0] = tappedCard;
-                    });
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Center(
-                        child: Image.asset(
-                          getCardImagePath(player1[index]),
-                          width: 100,
-                          height: 100,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-              ),
-              itemCount: throwCards.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Center(
-                      child: Image.asset(
-                        getCardImagePath(throwCards[index]),
-                        width: 200,
-                        height: 150,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-
-        ],
-      ),
-    );
-  }
-
-  String getCardImagePath(PlayingCard card) {
-    String suitString = card.cardSuit.toString().split('.').last.toLowerCase();
-    String typeString = '';
-    switch (card.cardType) {
-      case CardType.ace:
-        typeString = 'A';
-        break;
-      case CardType.two:
-        typeString = '2';
-        break;
-      case CardType.three:
-        typeString = '3';
-        break;
-      case CardType.four:
-        typeString = '4';
-        break;
-      case CardType.five:
-        typeString = '5';
-        break;
-      case CardType.six:
-        typeString = '6';
-        break;
-      case CardType.seven:
-        typeString = '7';
-        break;
-      case CardType.eight:
-        typeString = '8';
-        break;
-      case CardType.nine:
-        typeString = '9';
-        break;
-      case CardType.ten:
-        typeString = '10';
-        break;
-      case CardType.jack:
-        typeString = 'J';
-        break;
-      case CardType.queen:
-        typeString = 'Q';
-        break;
-      case CardType.king:
-        typeString = 'K';
-        break;
-    }
-    return 'assets/cards_images/$suitString' + '_$typeString.png';
-  }
-}
-
-import 'package:flutter/material.dart';
-import 'package:cardgame/models/cards.dart';
-import 'dart:math';
-
-class PlaywithComp extends StatefulWidget {
-  @override
-  State<PlaywithComp> createState() => _PlaywithCompState();
-}
-
-class _PlaywithCompState extends State<PlaywithComp> {
-  List<PlayingCard> openCards = [];
-  List<PlayingCard> player1 = [];
-  List<PlayingCard> player2 = [];
-  List<PlayingCard> player3 = [];
-  List<PlayingCard> player4 = [];
-  List<PlayingCard> throwCards = [];
+  bool playedround1 = false;
 
   // Define suitToEnable variable to store the suit of the first card played
   CardSuit suitToEnable = CardSuit.spades;
@@ -367,12 +63,12 @@ class _PlaywithCompState extends State<PlaywithComp> {
     return uniqueCards;
   }
 
-  void gameLogic(PlayingCard card){
+  void cardonTop(PlayingCard card){
     String h = card.printCardInfo(card);
     print('CARD on top for player 1 = $h');
   }
 
-  void biggerCard(PlayingCard card1, PlayingCard card2, PlayingCard card3, PlayingCard card4) {
+  int biggerCard(List<PlayingCard> cards) {
     // Define the priority order of card types
     Map<CardType, int> priorityOrder = {
       CardType.ace: 13,
@@ -390,131 +86,93 @@ class _PlaywithCompState extends State<PlaywithComp> {
       CardType.two: 1,
     };
 
-    // Get the priority of each card type
-    int priority1 = priorityOrder[card1.cardType] ?? 0;
-    int priority2 = priorityOrder[card2.cardType] ?? 0;
-    int priority3 = priorityOrder[card3.cardType] ?? 0;
-    int priority4 = priorityOrder[card4.cardType] ?? 0;
+    // Initialize variables to store the highest card and its index
+    PlayingCard? highestCard;
+    int highestIndex = -1; // Initialize with an invalid index
 
-    // Compare the priorities
-    if (priority1 > priority2 && priority1 > priority3 && priority1 > priority4) {
-      print('${card1.printCardInfo(card1)} is bigger');
-    } else if (priority2 > priority1 && priority2 > priority3 && priority2 > priority4) {
-      print('${card2.printCardInfo(card2)} is bigger');
-    } else if (priority3 > priority1 && priority3 > priority2 && priority3 > priority4) {
-      print('${card3.printCardInfo(card3)} is bigger');
-    } else if (priority4 > priority1 && priority4 > priority2 && priority4 > priority3) {
-      print('${card4.printCardInfo(card4)} is bigger');
-    } else {
-      print('Both cards have the same priority');
+    // Iterate through the cards to find the highest card
+    for (int i = 0; i < cards.length; i++) {
+      PlayingCard currentCard = cards[i];
+
+      // Get the priority of the current card type
+      int currentPriority = priorityOrder[currentCard.cardType] ?? 0;
+
+      // Check if the current card is higher than the previous highest card
+      if (highestCard == null || currentPriority > (priorityOrder[highestCard.cardType] ?? 0)) {
+        highestCard = currentCard;
+        highestIndex = i;
+      }
     }
+
+    // Return the index of the highest card
+    return highestIndex;
   }
+
 
 
   void findSimilarSuitCard(List<PlayingCard> player1, List<PlayingCard> player2, List<PlayingCard> player3, List<PlayingCard> player4) {
-    List<List<PlayingCard>> p1_s = List.generate(4, (_) => []);
-    List<List<PlayingCard>> p2_s = List.generate(4, (_) => []);
-    List<List<PlayingCard>> p3_s = List.generate(4, (_) => []);
-    List<List<PlayingCard>> p4_s = List.generate(4, (_) => []);
+    // Create lists to store segregated cards for each player and each suit
+    p1_s = List.generate(4, (_) => []);
+    p2_s = List.generate(4, (_) => []);
+    p3_s = List.generate(4, (_) => []);
+    p4_s = List.generate(4, (_) => []);
 
+    // Populate lists with segregated cards based on suit
+    populateSegregatedCards(player1, p1_s);
+    populateSegregatedCards(player2, p2_s);
+    populateSegregatedCards(player3, p3_s);
+    populateSegregatedCards(player4, p4_s);
 
-    for (PlayingCard card in player1) {
-      switch (card.cardSuit) {
-        case CardSuit.spades:
-          p1_s[0].add(card);
-          break;
-        case CardSuit.hearts:
-          p1_s[1].add(card);
-          break;
-        case CardSuit.diamonds:
-          p1_s[2].add(card);
-          break;
-        case CardSuit.clubs:
-          p1_s[3].add(card);
-          break;
-      }
-    }
+    // Sort the subarrays based on card type priority
+    sortSubarrays(p1_s);
+    sortSubarrays(p2_s);
+    sortSubarrays(p3_s);
+    sortSubarrays(p4_s);
 
-    for (PlayingCard card in player2) {
-      switch (card.cardSuit) {
-        case CardSuit.spades:
-          p2_s[0].add(card);
-          break;
-        case CardSuit.hearts:
-          p2_s[1].add(card);
-          break;
-        case CardSuit.diamonds:
-          p2_s[2].add(card);
-          break;
-        case CardSuit.clubs:
-          p2_s[3].add(card);
-          break;
-      }
-    }
+    // Reverse the subarrays
+    reverseSubarrays(p1_s);
+    reverseSubarrays(p2_s);
+    reverseSubarrays(p3_s);
+    reverseSubarrays(p4_s);
 
-    for (PlayingCard card in player3) {
-      switch (card.cardSuit) {
-        case CardSuit.spades:
-          p3_s[0].add(card);
-          break;
-        case CardSuit.hearts:
-          p3_s[1].add(card);
-          break;
-        case CardSuit.diamonds:
-          p3_s[2].add(card);
-          break;
-        case CardSuit.clubs:
-          p3_s[3].add(card);
-          break;
-      }
-    }
-
-    for (PlayingCard card in player4) {
-      switch (card.cardSuit) {
-        case CardSuit.spades:
-          p4_s[0].add(card);
-          break;
-        case CardSuit.hearts:
-          p4_s[1].add(card);
-          break;
-        case CardSuit.diamonds:
-          p4_s[2].add(card);
-          break;
-        case CardSuit.clubs:
-          p4_s[3].add(card);
-          break;
-      }
-    }
-
-    // Print the segregated cards for player 1
-    print('Segregated cards for player 1:');
-    for (int i = 0; i < p1_s.length; i++) {
-      List<String> cardNames = p1_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-      print("Suit ${i + 1}: $cardNames");
-    }
-
-    print('Segregated cards for player 2:');
-    for (int i = 0; i < p2_s.length; i++) {
-      List<String> cardNames = p2_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-      print("Suit ${i + 1}: $cardNames");
-    }
-
-    print('Segregated cards for player 3:');
-    for (int i = 0; i < p3_s.length; i++) {
-      List<String> cardNames = p3_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-      print("Suit ${i + 1}: $cardNames");
-    }
-
-    print('Segregated cards for player 4:');
-    for (int i = 0; i < p4_s.length; i++) {
-      List<String> cardNames = p4_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-      print("Suit ${i + 1}: $cardNames");
-    }
-
-    // Now you have segregated arrays for each player and each suit
-    // You can use these arrays as needed
+    // Print segregated and sorted cards
+    printSegregatedAndSortedCards(p1_s, 'Player 1');
+    printSegregatedAndSortedCards(p2_s, 'Player 2');
+    printSegregatedAndSortedCards(p3_s, 'Player 3');
+    printSegregatedAndSortedCards(p4_s, 'Player 4');
   }
 
+// Function to populate lists with segregated cards based on suit
+  void populateSegregatedCards(List<PlayingCard> player, List<List<PlayingCard>> p_s) {
+    for (PlayingCard card in player) {
+      int index = card.cardSuit.index; // Get index based on enum value
+      p_s[index].add(card);
+    }
+  }
+
+  // Function to sort the subarrays based on card type priority
+  void sortSubarrays(List<List<PlayingCard>> lists) {
+    for (List<PlayingCard> sublist in lists) {
+      sublist.sort((a, b) => a.cardType.index.compareTo(b.cardType.index)); // Sort based on card type priority
+    }
+  }
+
+  // Function to reverse the subarrays
+  void reverseSubarrays(List<List<PlayingCard>> lists) {
+    for (int i = 0; i < lists.length; i++) {
+      lists[i] = lists[i].reversed.toList(); // Reverse the sublist and assign it back to the original list
+    }
+  }
+
+
+  // Function to print segregated and sorted cards
+  void printSegregatedAndSortedCards(List<List<PlayingCard>> p_s, String playerName) {
+    print('Segregated and Sorted cards for $playerName:');
+    for (int i = 0; i < p_s.length; i++) {
+      List<String> cardNames = p_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
+      print("Suit ${i + 1}: $cardNames");
+    }
+  }
 
   void distributeCards() {
     int cardsPerPlayer = 13;
@@ -525,7 +183,7 @@ class _PlaywithCompState extends State<PlaywithComp> {
     // player2 =
     throwCards = [player1[0], player2[0], player3[0], player4[0]];
     print('player[0]=${player1[0]}');
-    gameLogic(player1[0]);
+    cardonTop(player1[0]);
     findSimilarSuitCard(player1, player2, player3, player4);
 
     printPlayerCards(player2, "Player 2");
@@ -538,766 +196,101 @@ class _PlaywithCompState extends State<PlaywithComp> {
     print("$playerName: $cardNames");
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.green,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-              ),
-              itemCount: throwCards.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Center(
-                      child: Image.asset(
-                        getCardImagePath(throwCards[index]),
-                        width: 200,
-                        height: 150,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
+  void showCardComparisonDialog(String message, int playerIndex) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Card Comparison Result'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(message),
+              SizedBox(height: 10),
+              Text('Played by Player ${playerIndex + 1}'),
+            ],
           ),
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 7,
-              ),
-              itemCount: player1.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    PlayingCard tappedCard = player1[index];
-                    suitToEnable = throwCards[0].cardSuit;
-                    if (tappedCard.cardSuit == suitToEnable) {
-                      setState(() {
-                        throwCards[0] = tappedCard;
-                        biggerCard(throwCards[0],throwCards[1],throwCards[2],throwCards[3]);
-                      });
-                    }
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Center(
-                        child: Image.asset(
-                          getCardImagePath(player1[index]),
-                          width: 100,
-                          height: 100,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-
-  String getCardImagePath(PlayingCard card) {
-    String suitString = card.cardSuit.toString().split('.').last.toLowerCase();
-    String typeString = '';
-    switch (card.cardType) {
-      case CardType.ace:
-        typeString = 'A';
-        break;
-      case CardType.two:
-        typeString = '2';
-        break;
-      case CardType.three:
-        typeString = '3';
-        break;
-      case CardType.four:
-        typeString = '4';
-        break;
-      case CardType.five:
-        typeString = '5';
-        break;
-      case CardType.six:
-        typeString = '6';
-        break;
-      case CardType.seven:
-        typeString = '7';
-        break;
-      case CardType.eight:
-        typeString = '8';
-        break;
-      case CardType.nine:
-        typeString = '9';
-        break;
-      case CardType.ten:
-        typeString = '10';
-        break;
-      case CardType.jack:
-        typeString = 'J';
-        break;
-      case CardType.queen:
-        typeString = 'Q';
-        break;
-      case CardType.king:
-        typeString = 'K';
-        break;
-    }
-    return 'assets/cards_images/$suitString' + '_$typeString.png';
-  }
-}
-import 'package:flutter/material.dart';
-import 'package:cardgame/models/cards.dart';
-import 'dart:math';
-
-class PlaywithComp extends StatefulWidget {
-  @override
-  State<PlaywithComp> createState() => _PlaywithCompState();
-}
-
-class _PlaywithCompState extends State<PlaywithComp> {
-  List<PlayingCard> openCards = [];
-  List<PlayingCard> player1 = [];
-  List<PlayingCard> player2 = [];
-  List<PlayingCard> player3 = [];
-  List<PlayingCard> player4 = [];
-  List<PlayingCard> throwCards = [];
-
-  // Define suitToEnable variable to store the suit of the first card played
-  CardSuit suitToEnable = CardSuit.spades;
-
-  @override
-  void initState() {
-    super.initState();
-    // Generate 13 unique open cards
-    openCards = generateUniqueOpenCards();
-
-    // Ensure throwCards is not empty before accessing its first element
-    if (throwCards.isNotEmpty) {
-      suitToEnable = throwCards[1].cardSuit;
-    }
-
-    // Shuffle the cards
-    openCards.shuffle();
-
-    // Distribute cards among players
-    distributeCards();
-  }
-
-
-  List<PlayingCard> generateUniqueOpenCards() {
-    List<PlayingCard> uniqueCards = [];
-    Random random = Random();
-    Set<String> generatedCards = Set();
-
-
-    while (uniqueCards.length < 52) {
-      CardSuit randomSuit = CardSuit.values[random.nextInt(CardSuit.values.length)];
-      CardType randomType = CardType.values[random.nextInt(CardType.values.length)];
-      String cardKey = '$randomSuit-$randomType';
-
-      if (!generatedCards.contains(cardKey)) {
-        uniqueCards.add(PlayingCard(cardSuit: randomSuit, cardType: randomType, faceUp: true, opened: true));
-        generatedCards.add(cardKey);
-      }
-    }
-    print('generatedCards = $generatedCards');
-
-    return uniqueCards;
-  }
-
-  void gameLogic(PlayingCard card){
-    String h = card.printCardInfo(card);
-    print('CARD on top for player 1 = $h');
-  }
-
-  void biggerCard(PlayingCard card1, PlayingCard card2, PlayingCard card3, PlayingCard card4) {
-    // Define the priority order of card types
-    Map<CardType, int> priorityOrder = {
-      CardType.ace: 13,
-      CardType.king: 12,
-      CardType.queen: 11,
-      CardType.jack: 10,
-      CardType.ten: 9,
-      CardType.nine: 8,
-      CardType.eight: 7,
-      CardType.seven: 6,
-      CardType.six: 5,
-      CardType.five: 4,
-      CardType.four: 3,
-      CardType.three: 2,
-      CardType.two: 1,
-    };
-
-    // Get the priority of each card type
-    int priority1 = priorityOrder[card1.cardType] ?? 0;
-    int priority2 = priorityOrder[card2.cardType] ?? 0;
-    int priority3 = priorityOrder[card3.cardType] ?? 0;
-    int priority4 = priorityOrder[card4.cardType] ?? 0;
-
-    // Compare the priorities
-    if (priority1 > priority2 && priority1 > priority3 && priority1 > priority4) {
-      print('${card1.printCardInfo(card1)} is bigger');
-    } else if (priority2 > priority1 && priority2 > priority3 && priority2 > priority4) {
-      print('${card2.printCardInfo(card2)} is bigger');
-    } else if (priority3 > priority1 && priority3 > priority2 && priority3 > priority4) {
-      print('${card3.printCardInfo(card3)} is bigger');
-    } else if (priority4 > priority1 && priority4 > priority2 && priority4 > priority3) {
-      print('${card4.printCardInfo(card4)} is bigger');
-    } else {
-      print('Both cards have the same priority');
-    }
-  }
-
-
-  void findSimilarSuitCard(List<PlayingCard> player1, List<PlayingCard> player2, List<PlayingCard> player3, List<PlayingCard> player4) {
-    List<List<PlayingCard>> p1_s = List.generate(4, (_) => []);
-    List<List<PlayingCard>> p2_s = List.generate(4, (_) => []);
-    List<List<PlayingCard>> p3_s = List.generate(4, (_) => []);
-    List<List<PlayingCard>> p4_s = List.generate(4, (_) => []);
-
-
-    for (PlayingCard card in player1) {
-      switch (card.cardSuit) {
-        case CardSuit.spades:
-          p1_s[0].add(card);
-          break;
-        case CardSuit.hearts:
-          p1_s[1].add(card);
-          break;
-        case CardSuit.diamonds:
-          p1_s[2].add(card);
-          break;
-        case CardSuit.clubs:
-          p1_s[3].add(card);
-          break;
-      }
-    }
-
-    for (PlayingCard card in player2) {
-      switch (card.cardSuit) {
-        case CardSuit.spades:
-          p2_s[0].add(card);
-          break;
-        case CardSuit.hearts:
-          p2_s[1].add(card);
-          break;
-        case CardSuit.diamonds:
-          p2_s[2].add(card);
-          break;
-        case CardSuit.clubs:
-          p2_s[3].add(card);
-          break;
-      }
-    }
-
-    for (PlayingCard card in player3) {
-      switch (card.cardSuit) {
-        case CardSuit.spades:
-          p3_s[0].add(card);
-          break;
-        case CardSuit.hearts:
-          p3_s[1].add(card);
-          break;
-        case CardSuit.diamonds:
-          p3_s[2].add(card);
-          break;
-        case CardSuit.clubs:
-          p3_s[3].add(card);
-          break;
-      }
-    }
-
-    for (PlayingCard card in player4) {
-      switch (card.cardSuit) {
-        case CardSuit.spades:
-          p4_s[0].add(card);
-          break;
-        case CardSuit.hearts:
-          p4_s[1].add(card);
-          break;
-        case CardSuit.diamonds:
-          p4_s[2].add(card);
-          break;
-        case CardSuit.clubs:
-          p4_s[3].add(card);
-          break;
-      }
-    }
-
-    // Print the segregated cards for player 1
-    print('Segregated cards for player 1:');
-    for (int i = 0; i < p1_s.length; i++) {
-      List<String> cardNames = p1_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-      print("Suit ${i + 1}: $cardNames");
-    }
-
-    print('Segregated cards for player 2:');
-    for (int i = 0; i < p2_s.length; i++) {
-      List<String> cardNames = p2_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-      print("Suit ${i + 1}: $cardNames");
-    }
-
-    print('Segregated cards for player 3:');
-    for (int i = 0; i < p3_s.length; i++) {
-      List<String> cardNames = p3_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-      print("Suit ${i + 1}: $cardNames");
-    }
-
-    print('Segregated cards for player 4:');
-    for (int i = 0; i < p4_s.length; i++) {
-      List<String> cardNames = p4_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-      print("Suit ${i + 1}: $cardNames");
-    }
-
-    // Now you have segregated arrays for each player and each suit
-    // You can use these arrays as needed
-  }
-
-
-  void distributeCards() {
-    int cardsPerPlayer = 13;
-    player1 = openCards.sublist(0, cardsPerPlayer);
-    player2 = openCards.sublist(cardsPerPlayer, cardsPerPlayer * 2);
-    player3 = openCards.sublist(cardsPerPlayer * 2, cardsPerPlayer * 3);
-    player4 = openCards.sublist(cardsPerPlayer * 3);
-    // player2 =
-    throwCards = [player1[0], player2[0], player3[0], player4[0]];
-    print('player[0]=${player1[0]}');
-    gameLogic(player1[0]);
-    findSimilarSuitCard(player1, player2, player3, player4);
-
-    printPlayerCards(player2, "Player 2");
-    printPlayerCards(player3, "Player 3");
-    printPlayerCards(player4, "Player 4");
-  }
-
-  void printPlayerCards(List<PlayingCard> cards, String playerName) {
-    List<String> cardNames = cards.map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-    print("$playerName: $cardNames");
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.green,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-              ),
-              itemCount: throwCards.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Center(
-                      child: Image.asset(
-                        getCardImagePath(throwCards[index]),
-                        width: 200,
-                        height: 150,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          Align(
-            alignment: Alignment.topRight,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 0.0, right: 8.0), // Adjust right padding as needed
-              child: TextButton(
-                onPressed: () {
-                  print('Button pressed');
-                  // Add your logic for the tick button here
-                },
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.white),
-                  // shape: MaterialStateProperty.all(
-                  //   RoundedRectangleBorder(
-                  //     borderRadius: BorderRadius.circular(8.0),
-                  //   ),
-                  // ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.check,
-                      color: Colors.black,
-                    ),
-                    SizedBox(width: 4), // Adjust spacing between icon and text
-                    Text(
-                      'PASS',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16, // Adjust font size as needed
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 7,
-              ),
-              itemCount: player1.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    PlayingCard tappedCard = player1[index];
-                    setState(() {
-                      throwCards[0] = tappedCard;
-                    });
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Center(
-                        child: Image.asset(
-                          getCardImagePath(player1[index]),
-                          width: 100,
-                          height: 100,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-
-
-
-          // Add the tick button below the player's cards
-          /*Padding(
-            padding: const EdgeInsets.only(bottom: 20.0),
-            child: IconButton(
-              icon: Icon(Icons.check),
+          actions: <Widget>[
+            TextButton(
               onPressed: () {
-                // Add your logic for the tick button here
+                Navigator.of(context).pop(); // Close the dialog
               },
+              child: Text('OK'),
             ),
-          ),*/
-        ],
-      ),
+          ],
+        );
+      },
     );
   }
 
 
+  void roundOne() {
+    // Player 1 plays a card of their choice (You can implement UI to let the player select a card)
+    PlayingCard selectedCard = throwCards[0];
 
-  String getCardImagePath(PlayingCard card) {
-    String suitString = card.cardSuit.toString().split('.').last.toLowerCase();
-    String typeString = '';
-    switch (card.cardType) {
-      case CardType.ace:
-        typeString = 'A';
-        break;
-      case CardType.two:
-        typeString = '2';
-        break;
-      case CardType.three:
-        typeString = '3';
-        break;
-      case CardType.four:
-        typeString = '4';
-        break;
-      case CardType.five:
-        typeString = '5';
-        break;
-      case CardType.six:
-        typeString = '6';
-        break;
-      case CardType.seven:
-        typeString = '7';
-        break;
-      case CardType.eight:
-        typeString = '8';
-        break;
-      case CardType.nine:
-        typeString = '9';
-        break;
-      case CardType.ten:
-        typeString = '10';
-        break;
-      case CardType.jack:
-        typeString = 'J';
-        break;
-      case CardType.queen:
-        typeString = 'Q';
-        break;
-      case CardType.king:
-        typeString = 'K';
-        break;
-    }
-    return 'assets/cards_images/$suitString' + '_$typeString.png';
-  }
-}
- */
+    // Remove the selected card from Player 1's hand
+    player1.remove(selectedCard);
 
-import 'package:flutter/material.dart';
-import 'package:cardgame/models/cards.dart';
-import 'dart:math';
+    // Update throwCards with the card played by Player 1
+    throwCards[0] = selectedCard;
 
-class PlaywithComp extends StatefulWidget {
-  @override
-  State<PlaywithComp> createState() => _PlaywithCompState();
-}
+    // Update the top card from each player's hand
+    throwCards[1] = player2.isNotEmpty ? player2[0] : PlayingCard(cardSuit: CardSuit.spades, cardType: CardType.ace, faceUp: true, opened: true);
+    throwCards[2] = player3.isNotEmpty ? player3[0] : PlayingCard(cardSuit: CardSuit.spades, cardType: CardType.ace, faceUp: true, opened: true);
+    throwCards[3] = player4.isNotEmpty ? player4[0] : PlayingCard(cardSuit: CardSuit.spades, cardType: CardType.ace, faceUp: true, opened: true);
 
-class _PlaywithCompState extends State<PlaywithComp> {
-  List<PlayingCard> openCards = [];
-  List<PlayingCard> player1 = [];
-  List<PlayingCard> player2 = [];
-  List<PlayingCard> player3 = [];
-  List<PlayingCard> player4 = [];
-  List<PlayingCard> throwCards = [];
-
-  // Define suitToEnable variable to store the suit of the first card played
-  CardSuit suitToEnable = CardSuit.spades;
-
-  @override
-  void initState() {
-    super.initState();
-    // Generate 13 unique open cards
-    openCards = generateUniqueOpenCards();
-
-    // Ensure throwCards is not empty before accessing its first element
-    if (throwCards.isNotEmpty) {
-      suitToEnable = throwCards[1].cardSuit;
-    }
-
-    // Shuffle the cards
-    openCards.shuffle();
-
-    // Distribute cards among players
-    distributeCards();
-  }
-
-
-  List<PlayingCard> generateUniqueOpenCards() {
-    List<PlayingCard> uniqueCards = [];
-    Random random = Random();
-    Set<String> generatedCards = Set();
-
-
-    while (uniqueCards.length < 52) {
-      CardSuit randomSuit = CardSuit.values[random.nextInt(CardSuit.values.length)];
-      CardType randomType = CardType.values[random.nextInt(CardType.values.length)];
-      String cardKey = '$randomSuit-$randomType';
-
-      if (!generatedCards.contains(cardKey)) {
-        uniqueCards.add(PlayingCard(cardSuit: randomSuit, cardType: randomType, faceUp: true, opened: true));
-        generatedCards.add(cardKey);
-      }
-    }
-    print('generatedCards = $generatedCards');
-
-    return uniqueCards;
-  }
-
-  void gameLogic(PlayingCard card){
-    String h = card.printCardInfo(card);
-    print('CARD on top for player 1 = $h');
-  }
-
-  void biggerCard(PlayingCard card1, PlayingCard card2, PlayingCard card3, PlayingCard card4) {
-    // Define the priority order of card types
-    Map<CardType, int> priorityOrder = {
-      CardType.ace: 13,
-      CardType.king: 12,
-      CardType.queen: 11,
-      CardType.jack: 10,
-      CardType.ten: 9,
-      CardType.nine: 8,
-      CardType.eight: 7,
-      CardType.seven: 6,
-      CardType.six: 5,
-      CardType.five: 4,
-      CardType.four: 3,
-      CardType.three: 2,
-      CardType.two: 1,
-    };
-
-    // Get the priority of each card type
-    int priority1 = priorityOrder[card1.cardType] ?? 0;
-    int priority2 = priorityOrder[card2.cardType] ?? 0;
-    int priority3 = priorityOrder[card3.cardType] ?? 0;
-    int priority4 = priorityOrder[card4.cardType] ?? 0;
-
-    // Compare the priorities
-    if (priority1 > priority2 && priority1 > priority3 && priority1 > priority4) {
-      print('${card1.printCardInfo(card1)} is bigger');
-    } else if (priority2 > priority1 && priority2 > priority3 && priority2 > priority4) {
-      print('${card2.printCardInfo(card2)} is bigger');
-    } else if (priority3 > priority1 && priority3 > priority2 && priority3 > priority4) {
-      print('${card3.printCardInfo(card3)} is bigger');
-    } else if (priority4 > priority1 && priority4 > priority2 && priority4 > priority3) {
-      print('${card4.printCardInfo(card4)} is bigger');
+    // Call the game logic or any other necessary functions
+    // Here you can call functions like biggerCard() or findSimilarSuitCard() as needed
+    // For example:
+    int? highestIndex = biggerCard(throwCards);
+    if (highestIndex != null) {
+      // Display the result in an AlertDialog
+      showCardComparisonDialog('${throwCards[highestIndex].printCardInfo(throwCards[highestIndex])} is bigger', highestIndex);
     } else {
-      print('Both cards have the same priority');
+      // No card played yet, handle this case accordingly
+    }
+
+    // Update UI to reflect the changes
+    setState(() {
+      // Update throwCards with the selected card from Player 1 and top cards from other players
+      throwCards[0] = selectedCard;
+      throwCards[1] = player2.isNotEmpty ? player2[0] : throwCards[1];
+      throwCards[2] = player3.isNotEmpty ? player3[0] : throwCards[2];
+      throwCards[3] = player4.isNotEmpty ? player4[0] : throwCards[3];
+
+      // Update the state for players 2, 3, and 4
+      // This will trigger the UI update for their cards
+      // Replace the empty lists with the actual card lists for players 2, 3, and 4
+      updatePlayerCards(player2, player2);
+      updatePlayerCards(player3, player3);
+      updatePlayerCards(player4, player4);
+    });
+  }
+
+
+  void currentSuitPlayed(CardSuit suit) {
+    // Determine the index of the suit in the p2_s list
+    int suitIndex = suit.index;
+
+    // Get the sublist corresponding to the suit
+    List<PlayingCard> suitSublist = p2_s[suitIndex];
+    print('suitsublist = $suitSublist');
+
+    // Check if the sublist is not empty
+    if (suitSublist.isNotEmpty) {
+      // Play the first card from the sublist
+      PlayingCard playedCard = suitSublist.first;
+
+      // Remove the played card from the sublist
+      suitSublist.removeAt(0);
+
+      // Update UI to reflect the played card
+      // You need to implement UI update logic here
     }
   }
 
 
-  void findSimilarSuitCard(List<PlayingCard> player1, List<PlayingCard> player2, List<PlayingCard> player3, List<PlayingCard> player4) {
-    List<List<PlayingCard>> p1_s = List.generate(4, (_) => []);
-    List<List<PlayingCard>> p2_s = List.generate(4, (_) => []);
-    List<List<PlayingCard>> p3_s = List.generate(4, (_) => []);
-    List<List<PlayingCard>> p4_s = List.generate(4, (_) => []);
-
-
-    for (PlayingCard card in player1) {
-      switch (card.cardSuit) {
-        case CardSuit.spades:
-          p1_s[0].add(card);
-          break;
-        case CardSuit.hearts:
-          p1_s[1].add(card);
-          break;
-        case CardSuit.diamonds:
-          p1_s[2].add(card);
-          break;
-        case CardSuit.clubs:
-          p1_s[3].add(card);
-          break;
-      }
-    }
-
-    for (PlayingCard card in player2) {
-      switch (card.cardSuit) {
-        case CardSuit.spades:
-          p2_s[0].add(card);
-          break;
-        case CardSuit.hearts:
-          p2_s[1].add(card);
-          break;
-        case CardSuit.diamonds:
-          p2_s[2].add(card);
-          break;
-        case CardSuit.clubs:
-          p2_s[3].add(card);
-          break;
-      }
-    }
-
-    for (PlayingCard card in player3) {
-      switch (card.cardSuit) {
-        case CardSuit.spades:
-          p3_s[0].add(card);
-          break;
-        case CardSuit.hearts:
-          p3_s[1].add(card);
-          break;
-        case CardSuit.diamonds:
-          p3_s[2].add(card);
-          break;
-        case CardSuit.clubs:
-          p3_s[3].add(card);
-          break;
-      }
-    }
-
-    for (PlayingCard card in player4) {
-      switch (card.cardSuit) {
-        case CardSuit.spades:
-          p4_s[0].add(card);
-          break;
-        case CardSuit.hearts:
-          p4_s[1].add(card);
-          break;
-        case CardSuit.diamonds:
-          p4_s[2].add(card);
-          break;
-        case CardSuit.clubs:
-          p4_s[3].add(card);
-          break;
-      }
-    }
-
-    // Print the segregated cards for player 1
-    print('Segregated cards for player 1:');
-    for (int i = 0; i < p1_s.length; i++) {
-      List<String> cardNames = p1_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-      print("Suit ${i + 1}: $cardNames");
-    }
-
-    print('Segregated cards for player 2:');
-    for (int i = 0; i < p2_s.length; i++) {
-      List<String> cardNames = p2_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-      print("Suit ${i + 1}: $cardNames");
-    }
-
-    print('Segregated cards for player 3:');
-    for (int i = 0; i < p3_s.length; i++) {
-      List<String> cardNames = p3_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-      print("Suit ${i + 1}: $cardNames");
-    }
-
-    print('Segregated cards for player 4:');
-    for (int i = 0; i < p4_s.length; i++) {
-      List<String> cardNames = p4_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-      print("Suit ${i + 1}: $cardNames");
-    }
-
-    // Now you have segregated arrays for each player and each suit
-    // You can use these arrays as needed
-  }
-
-
-  void distributeCards() {
-    int cardsPerPlayer = 13;
-    player1 = openCards.sublist(0, cardsPerPlayer);
-    player2 = openCards.sublist(cardsPerPlayer, cardsPerPlayer * 2);
-    player3 = openCards.sublist(cardsPerPlayer * 2, cardsPerPlayer * 3);
-    player4 = openCards.sublist(cardsPerPlayer * 3);
-    // player2 =
-    throwCards = [player1[0], player2[0], player3[0], player4[0]];
-    print('player[0]=${player1[0]}');
-    gameLogic(player1[0]);
-    findSimilarSuitCard(player1, player2, player3, player4);
-
-    printPlayerCards(player2, "Player 2");
-    printPlayerCards(player3, "Player 3");
-    printPlayerCards(player4, "Player 4");
-  }
-
-  void printPlayerCards(List<PlayingCard> cards, String playerName) {
-    List<String> cardNames = cards.map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-    print("$playerName: $cardNames");
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -1335,41 +328,66 @@ class _PlaywithCompState extends State<PlaywithComp> {
           ),
           Align(
             alignment: Alignment.topRight,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 0.0, right: 8.0), // Adjust right padding as needed
-              child: TextButton(
-                onPressed: () {
-                  print('Button pressed');
-                  // Add your logic for the tick button here
-                },
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.white),
-                  // shape: MaterialStateProperty.all(
-                  //   RoundedRectangleBorder(
-                  //     borderRadius: BorderRadius.circular(8.0),
-                  //   ),
-                  // ),
+            child: ElevatedButton(
+              onPressed: () {
+                print('Button pressed');
+                playedround1 = true;
+                print('played=$playedround1');
+
+                // Get the selected card from Player 1's hand
+                PlayingCard selectedCard = throwCards[0];
+
+                // Remove the selected card from Player 1's hand
+                player1.remove(throwCards[0]);
+
+                // Update the top cards from each player's hand in throwCards
+                // throwCards[1] = player2.isNotEmpty ? player2[0] : throwCards[1];
+                // throwCards[2] = player3.isNotEmpty ? player3[0] : throwCards[2];
+                // throwCards[3] = player4.isNotEmpty ? player4[0] : throwCards[3];
+                // Update the top cards from each player's hand in throwCards with the highest card of the current suit
+                // Update the top cards from each player's hand in throwCards with the highest card of the current suit
+                throwCards[1] = player2[throwCards[0].cardSuit.index] != null && p2_s[throwCards[0].cardSuit.index].isNotEmpty ? p2_s[throwCards[0].cardSuit.index][0] : throwCards[1];
+                throwCards[2] = player3[throwCards[0].cardSuit.index] != null && p3_s[throwCards[0].cardSuit.index].isNotEmpty ? p3_s[throwCards[0].cardSuit.index][0] : throwCards[2];
+                throwCards[3] = player4[throwCards[0].cardSuit.index] != null && p4_s[throwCards[0].cardSuit.index].isNotEmpty ? p4_s[throwCards[0].cardSuit.index][0] : throwCards[3];
+
+                // Update UI to reflect the changes
+                setState(() {
+                  // Update throwCards with the selected card from Player 1 and top cards from other players
+                  throwCards[1] = throwCards[1]; // Update the top card with Player 2's card
+                  throwCards[2] = throwCards[2]; // Update Player 2's card with Player 3's card
+                  throwCards[3] = throwCards[3]; // Update Player 3's card with Player 4's card
+                });
+
+
+                // Call the game logic or any other necessary functions
+                // Here you can call functions like biggerCard() or findSimilarSuitCard() as needed
+                // For example:
+                int? highestIndex = biggerCard(throwCards);
+                if (highestIndex != null) {
+                  // Display the result in an AlertDialog
+                  setState(() {
+                    showCardComparisonDialog('${throwCards[highestIndex].printCardInfo(throwCards[highestIndex])} is bigger', highestIndex);
+                  });
+                } else {
+                  // No card played yet, handle this case accordingly
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                primary: Colors.white,
+                padding: EdgeInsets.zero, // No padding around the button
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.check,
-                      color: Colors.black,
-                    ),
-                    SizedBox(width: 4), // Adjust spacing between icon and text
-                    Text(
-                      'PASS',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16, // Adjust font size as needed
-                      ),
-                    ),
-                  ],
+              ),
+              child: Text(
+                'PASS',
+                style: TextStyle(
+                  color: Colors.black,
                 ),
               ),
             ),
           ),
+
           Expanded(
             child: GridView.builder(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -1384,7 +402,11 @@ class _PlaywithCompState extends State<PlaywithComp> {
                     if (tappedCard.cardSuit == suitToEnable) {
                       setState(() {
                         throwCards[0] = tappedCard;
-                        biggerCard(throwCards[0],throwCards[1],throwCards[2],throwCards[3]);
+                        int highestIndex = biggerCard(throwCards); // Call with only one argument
+                        if (highestIndex >= 0) {
+                          //showCardComparisonDialog('${throwCards[highestIndex].printCardInfo(throwCards[highestIndex])} is bigger');
+                          currentSuitPlayed(tappedCard.cardSuit);
+                        }
                       });
                     }
                   },
@@ -1412,6 +434,22 @@ class _PlaywithCompState extends State<PlaywithComp> {
       ),
     );
   }
+
+  // Function to update player's cards displayed on the UI
+  void updatePlayerCards(List<PlayingCard> sourceCards, List<PlayingCard> targetPlayerCards) {
+    // Iterate through each suit and update the corresponding card in the target player's cards
+    for (int i = 0; i < sourceCards.length; i++) {
+      // Update the card in the target player's cards
+      targetPlayerCards[i] = sourceCards[i];
+    }
+
+    // Update the UI to reflect the changes
+    setState(() {
+      // No need to do anything here if the UI is properly bound to the player's cards
+      // If UI widgets are properly bound to the targetPlayerCards list, Flutter will automatically update the UI
+    });
+  }
+
 
 
   String getCardImagePath(PlayingCard card) {
