@@ -19,6 +19,10 @@ class _PlaywithCompState extends State<PlaywithComp> {
   List<List<PlayingCard>> p4_s = [];
   List<PlayingCard> throwCards = [];
   bool playedround1 = false;
+  int player1Score = 0;
+  int player2Score = 0;
+  int player3Score = 0;
+  int player4Score = 0;
 
   // Define suitToEnable variable to store the suit of the first card played
   CardSuit suitToEnable = CardSuit.spades;
@@ -197,32 +201,64 @@ class _PlaywithCompState extends State<PlaywithComp> {
   }
 
   void showCardComparisonDialog(String message, int playerIndex) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Card Comparison Result'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(message),
-              SizedBox(height: 10),
-              Text('Played by Player ${playerIndex + 1}'),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: Text('OK'),
+    // Schedule the state update after the build method completes
+    Future.delayed(Duration.zero, () {
+      // Increment score based on player index
+      switch (playerIndex) {
+        case 0:
+          setState(() {
+            player1Score++; // Increment player 1's score
+          });
+          break;
+        case 1:
+          setState(() {
+            player2Score++; // Increment player 2's score
+          });
+          break;
+        case 2:
+          setState(() {
+            player3Score++; // Increment player 3's score
+          });
+          break;
+        case 3:
+          setState(() {
+            player4Score++; // Increment player 4's score
+          });
+          break;
+        default:
+        // Handle invalid player index
+          break;
+      }
+
+      // Show the dialog after updating the state
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Card Comparison Result'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(message),
+                SizedBox(height: 10),
+                Text('Played by Player ${playerIndex + 1}'),
+              ],
             ),
-          ],
-        );
-      },
-    );
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    });
   }
+
 
 
   void roundOne() {
@@ -294,6 +330,11 @@ class _PlaywithCompState extends State<PlaywithComp> {
 
   @override
   Widget build(BuildContext context) {
+    // Printing scores when the build method is called
+    print('Player 1 Score: $player1Score');
+    print('Player 2 Score: $player2Score');
+    print('Player 3 Score: $player3Score');
+    print('Player 4 Score: $player4Score');
     return Scaffold(
       backgroundColor: Colors.green,
       body: Column(
