@@ -43,6 +43,52 @@ class _PlaywithCompState extends State<PlaywithComp> {
     suitToEnable = throwCards[0].cardSuit;
   }
 
+  String getCardImagePath(PlayingCard card) {
+    String suitString = card.cardSuit.toString().split('.').last.toLowerCase();
+    String typeString = '';
+    switch (card.cardType) {
+      case CardType.ace:
+        typeString = 'A';
+        break;
+      case CardType.two:
+        typeString = '2';
+        break;
+      case CardType.three:
+        typeString = '3';
+        break;
+      case CardType.four:
+        typeString = '4';
+        break;
+      case CardType.five:
+        typeString = '5';
+        break;
+      case CardType.six:
+        typeString = '6';
+        break;
+      case CardType.seven:
+        typeString = '7';
+        break;
+      case CardType.eight:
+        typeString = '8';
+        break;
+      case CardType.nine:
+        typeString = '9';
+        break;
+      case CardType.ten:
+        typeString = '10';
+        break;
+      case CardType.jack:
+        typeString = 'J';
+        break;
+      case CardType.queen:
+        typeString = 'Q';
+        break;
+      case CardType.king:
+        typeString = 'K';
+        break;
+    }
+    return 'assets/cards_images/$suitString' + '_$typeString.png';
+  }
 
   List<PlayingCard> generateUniqueOpenCards() {
     List<PlayingCard> uniqueCards = [];
@@ -60,14 +106,9 @@ class _PlaywithCompState extends State<PlaywithComp> {
         generatedCards.add(cardKey);
       }
     }
-    print('generatedCards = $generatedCards');
+    //print('generatedCards = $generatedCards');
 
     return uniqueCards;
-  }
-
-  void cardonTop(PlayingCard card){
-    String h = card.printCardInfo(card);
-    print('CARD on top for player 1 = $h');
   }
 
   int biggerCard(List<PlayingCard> cards) {
@@ -110,7 +151,36 @@ class _PlaywithCompState extends State<PlaywithComp> {
     return highestIndex;
   }
 
+  // Function to populate lists with segregated cards based on suit
+  void populateSegregatedCards(List<PlayingCard> player, List<List<PlayingCard>> p_s) {
+    for (PlayingCard card in player) {
+      int index = card.cardSuit.index; // Get index based on enum value
+      p_s[index].add(card);
+    }
+  }
 
+  // Function to sort the subarrays based on card type priority
+  void sortSubarrays(List<List<PlayingCard>> lists) {
+    for (List<PlayingCard> sublist in lists) {
+      sublist.sort((a, b) => a.cardType.index.compareTo(b.cardType.index)); // Sort based on card type priority
+    }
+  }
+
+  // Function to reverse the subarrays
+  void reverseSubarrays(List<List<PlayingCard>> lists) {
+    for (int i = 0; i < lists.length; i++) {
+      lists[i] = lists[i].reversed.toList(); // Reverse the sublist and assign it back to the original list
+    }
+  }
+
+  // Function to print segregated and sorted cards
+  void printSegregatedAndSortedCards(List<List<PlayingCard>> p_s, String playerName) {
+    print('Segregated and Sorted cards for $playerName:');
+    for (int i = 0; i < p_s.length; i++) {
+      List<String> cardNames = p_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
+      print("Suit ${i + 1}: $cardNames");
+    }
+  }
 
   void findSimilarSuitCard(List<PlayingCard> player1, List<PlayingCard> player2, List<PlayingCard> player3, List<PlayingCard> player4) {
     // Create lists to store segregated cards for each player and each suit
@@ -144,36 +214,9 @@ class _PlaywithCompState extends State<PlaywithComp> {
     printSegregatedAndSortedCards(p4_s, 'Player 4');
   }
 
-// Function to populate lists with segregated cards based on suit
-  void populateSegregatedCards(List<PlayingCard> player, List<List<PlayingCard>> p_s) {
-    for (PlayingCard card in player) {
-      int index = card.cardSuit.index; // Get index based on enum value
-      p_s[index].add(card);
-    }
-  }
-
-  // Function to sort the subarrays based on card type priority
-  void sortSubarrays(List<List<PlayingCard>> lists) {
-    for (List<PlayingCard> sublist in lists) {
-      sublist.sort((a, b) => a.cardType.index.compareTo(b.cardType.index)); // Sort based on card type priority
-    }
-  }
-
-  // Function to reverse the subarrays
-  void reverseSubarrays(List<List<PlayingCard>> lists) {
-    for (int i = 0; i < lists.length; i++) {
-      lists[i] = lists[i].reversed.toList(); // Reverse the sublist and assign it back to the original list
-    }
-  }
-
-
-  // Function to print segregated and sorted cards
-  void printSegregatedAndSortedCards(List<List<PlayingCard>> p_s, String playerName) {
-    print('Segregated and Sorted cards for $playerName:');
-    for (int i = 0; i < p_s.length; i++) {
-      List<String> cardNames = p_s[i].map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-      print("Suit ${i + 1}: $cardNames");
-    }
+  void printPlayerCards(List<PlayingCard> cards, String playerName) {
+    List<String> cardNames = cards.map((card) => '${card.cardType} of ${card.cardSuit}').toList();
+    print("$playerName: $cardNames");
   }
 
   void distributeCards() {
@@ -184,8 +227,7 @@ class _PlaywithCompState extends State<PlaywithComp> {
     player4 = openCards.sublist(cardsPerPlayer * 3);
 
     throwCards = [player1[0], player2[0], player3[0], player4[0]];
-    print('player[0]=${player1[0]}');
-    cardonTop(player1[0]);
+    //print('player[0]=${player1[0]}');
     findSimilarSuitCard(player1, player2, player3, player4);
 
     printPlayerCards(player2, "Player 2");
@@ -193,28 +235,11 @@ class _PlaywithCompState extends State<PlaywithComp> {
     printPlayerCards(player4, "Player 4");
   }
 
-  void printPlayerCards(List<PlayingCard> cards, String playerName) {
-    List<String> cardNames = cards.map((card) => '${card.cardType} of ${card.cardSuit}').toList();
-    print("$playerName: $cardNames");
-  }
-
   void showCardComparisonDialog(String message, int playerIndex) {
     // Schedule the state update after the build method completes
     Future.delayed(Duration.zero, () {
       // Print the index of the winning player
       print('Winner: Player ${playerIndex + 1}');
-      if (playerIndex == 0) {
-        player1Score +=1;
-      }
-      if (playerIndex == 1) {
-        player2Score +=1;
-      }
-      if (playerIndex == 2) {
-        player3Score +=1;
-      }
-      if (playerIndex == 3) {
-        player4Score +=1;
-      }
 
       // Show the dialog after updating the state
       showDialog(
@@ -245,41 +270,6 @@ class _PlaywithCompState extends State<PlaywithComp> {
     });
   }
 
-  void roundOne() {
-    // Player 1 plays a card of their choice (You can implement UI to let the player select a card)
-    PlayingCard selectedCard = throwCards[0];
-
-    // Remove the selected card from Player 1's hand
-    player1.remove(selectedCard);
-
-    // Update throwCards with the card played by Player 1
-    throwCards[0] = selectedCard;
-
-    // Determine the winner of the round
-    int winnerIndex = biggerCard(throwCards);
-
-    // Display the result in an AlertDialog
-    showCardComparisonDialog('${throwCards[winnerIndex].printCardInfo(throwCards[winnerIndex])} is bigger', winnerIndex);
-
-    // Update UI to reflect the changes
-    setState(() {
-      // Update throwCards with the selected card from Player 1 and top cards from other players
-      throwCards[0] = selectedCard;
-      throwCards[1] = player2.isNotEmpty ? player2[0] : throwCards[1];
-      throwCards[2] = player3.isNotEmpty ? player3[0] : throwCards[2];
-      throwCards[3] = player4.isNotEmpty ? player4[0] : throwCards[3];
-
-      // Update the state for players 2, 3, and 4
-      // This will trigger the UI update for their cards
-      // Replace the empty lists with the actual card lists for players 2, 3, and 4
-      updatePlayerCards(player2, player2);
-      updatePlayerCards(player3, player3);
-      updatePlayerCards(player4, player4);
-    });
-  }
-
-
-
   void currentSuitPlayed(CardSuit suit) {
     // Determine the index of the suit in the p2_s list
     int suitIndex = suit.index;
@@ -302,21 +292,44 @@ class _PlaywithCompState extends State<PlaywithComp> {
   }
 
   // Function to find the winner of the current round
-  int findRoundWinner() {
+  int findRoundWinner(int playerIndex) {
+    if (playerIndex == 0) {
+      return 1; //Returning player number
+    }
+    if (playerIndex == 1) {
+      return 2;
+    }
+    if (playerIndex == 2) {
+      return 3;
+    }
+    if (playerIndex == 3) {
+      return 4;
+    }
+    return 0;
     // Implement your logic to determine the winner of the round
     // For now, let's assume player 4 always wins the round
-    return 3; // Player 4 index
+  }
+
+  void roundN(int roundNumber) {
+    // Rounds 2 to 13 logic (same for each round)
+    // For example:
+    // Determine starting player based on previous round's winner
+    // Players play their cards accordingly
+    // Determine the winner and update scores
+  }
+
+  void playerScore() {
+    // Printing scores when the build method is called
+    print('Player 1 Score: $player1Score');
+    print('Player 2 Score: $player2Score');
+    print('Player 3 Score: $player3Score');
+    print('Player 4 Score: $player4Score');
   }
 
 
   @override
   Widget build(BuildContext context) {
     String roundResultText = '';
-    // Printing scores when the build method is called
-    print('Player 1 Score: $player1Score');
-    print('Player 2 Score: $player2Score');
-    print('Player 3 Score: $player3Score');
-    print('Player 4 Score: $player4Score');
     return Scaffold(
       backgroundColor: Colors.green,
       body: Column(
@@ -353,7 +366,7 @@ class _PlaywithCompState extends State<PlaywithComp> {
             alignment: Alignment.topRight,
             child: ElevatedButton(
               onPressed: () {
-                print('Button pressed');
+                //print('Button pressed');
                 playedround1 = true;
                 print('played=$playedround1');
 
@@ -482,69 +495,5 @@ class _PlaywithCompState extends State<PlaywithComp> {
         ],
       ),
     );
-  }
-
-  // Function to update player's cards displayed on the UI
-  void updatePlayerCards(List<PlayingCard> sourceCards, List<PlayingCard> targetPlayerCards) {
-    // Iterate through each suit and update the corresponding card in the target player's cards
-    for (int i = 0; i < sourceCards.length; i++) {
-      // Update the card in the target player's cards
-      targetPlayerCards[i] = sourceCards[i];
-    }
-
-    // Update the UI to reflect the changes
-    setState(() {
-      // No need to do anything here if the UI is properly bound to the player's cards
-      // If UI widgets are properly bound to the targetPlayerCards list, Flutter will automatically update the UI
-    });
-  }
-
-
-
-  String getCardImagePath(PlayingCard card) {
-    String suitString = card.cardSuit.toString().split('.').last.toLowerCase();
-    String typeString = '';
-    switch (card.cardType) {
-      case CardType.ace:
-        typeString = 'A';
-        break;
-      case CardType.two:
-        typeString = '2';
-        break;
-      case CardType.three:
-        typeString = '3';
-        break;
-      case CardType.four:
-        typeString = '4';
-        break;
-      case CardType.five:
-        typeString = '5';
-        break;
-      case CardType.six:
-        typeString = '6';
-        break;
-      case CardType.seven:
-        typeString = '7';
-        break;
-      case CardType.eight:
-        typeString = '8';
-        break;
-      case CardType.nine:
-        typeString = '9';
-        break;
-      case CardType.ten:
-        typeString = '10';
-        break;
-      case CardType.jack:
-        typeString = 'J';
-        break;
-      case CardType.queen:
-        typeString = 'Q';
-        break;
-      case CardType.king:
-        typeString = 'K';
-        break;
-    }
-    return 'assets/cards_images/$suitString' + '_$typeString.png';
   }
 }
