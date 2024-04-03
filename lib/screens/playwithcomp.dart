@@ -33,16 +33,14 @@ class _PlaywithCompState extends State<PlaywithComp> {
     // Generate 13 unique open cards
     openCards = generateUniqueOpenCards();
 
-    // Ensure throwCards is not empty before accessing its first element
-    if (throwCards.isNotEmpty) {
-      suitToEnable = throwCards[1].cardSuit;
-    }
-
     // Shuffle the cards
     openCards.shuffle();
 
     // Distribute cards among players
     distributeCards();
+
+    // Set the suitToEnable variable to the suit of the first card played
+    suitToEnable = throwCards[0].cardSuit;
   }
 
 
@@ -184,7 +182,7 @@ class _PlaywithCompState extends State<PlaywithComp> {
     player2 = openCards.sublist(cardsPerPlayer, cardsPerPlayer * 2);
     player3 = openCards.sublist(cardsPerPlayer * 2, cardsPerPlayer * 3);
     player4 = openCards.sublist(cardsPerPlayer * 3);
-    // player2 =
+
     throwCards = [player1[0], player2[0], player3[0], player4[0]];
     print('player[0]=${player1[0]}');
     cardonTop(player1[0]);
@@ -203,31 +201,19 @@ class _PlaywithCompState extends State<PlaywithComp> {
   void showCardComparisonDialog(String message, int playerIndex) {
     // Schedule the state update after the build method completes
     Future.delayed(Duration.zero, () {
-      // Increment score based on player index
-      switch (playerIndex) {
-        case 0:
-          setState(() {
-            player1Score++; // Increment player 1's score
-          });
-          break;
-        case 1:
-          setState(() {
-            player2Score++; // Increment player 2's score
-          });
-          break;
-        case 2:
-          setState(() {
-            player3Score++; // Increment player 3's score
-          });
-          break;
-        case 3:
-          setState(() {
-            player4Score++; // Increment player 4's score
-          });
-          break;
-        default:
-        // Handle invalid player index
-          break;
+      // Print the index of the winning player
+      print('Winner: Player ${playerIndex + 1}');
+      if (playerIndex == 0) {
+        player1Score +=1;
+      }
+      if (playerIndex == 1) {
+        player2Score +=1;
+      }
+      if (playerIndex == 2) {
+        player3Score +=1;
+      }
+      if (playerIndex == 3) {
+        player4Score +=1;
       }
 
       // Show the dialog after updating the state
@@ -259,8 +245,6 @@ class _PlaywithCompState extends State<PlaywithComp> {
     });
   }
 
-
-
   void roundOne() {
     // Player 1 plays a card of their choice (You can implement UI to let the player select a card)
     PlayingCard selectedCard = throwCards[0];
@@ -271,21 +255,11 @@ class _PlaywithCompState extends State<PlaywithComp> {
     // Update throwCards with the card played by Player 1
     throwCards[0] = selectedCard;
 
-    // Update the top card from each player's hand
-    throwCards[1] = player2.isNotEmpty ? player2[0] : PlayingCard(cardSuit: CardSuit.spades, cardType: CardType.ace, faceUp: true, opened: true);
-    throwCards[2] = player3.isNotEmpty ? player3[0] : PlayingCard(cardSuit: CardSuit.spades, cardType: CardType.ace, faceUp: true, opened: true);
-    throwCards[3] = player4.isNotEmpty ? player4[0] : PlayingCard(cardSuit: CardSuit.spades, cardType: CardType.ace, faceUp: true, opened: true);
+    // Determine the winner of the round
+    int winnerIndex = biggerCard(throwCards);
 
-    // Call the game logic or any other necessary functions
-    // Here you can call functions like biggerCard() or findSimilarSuitCard() as needed
-    // For example:
-    int? highestIndex = biggerCard(throwCards);
-    if (highestIndex != null) {
-      // Display the result in an AlertDialog
-      showCardComparisonDialog('${throwCards[highestIndex].printCardInfo(throwCards[highestIndex])} is bigger', highestIndex);
-    } else {
-      // No card played yet, handle this case accordingly
-    }
+    // Display the result in an AlertDialog
+    showCardComparisonDialog('${throwCards[winnerIndex].printCardInfo(throwCards[winnerIndex])} is bigger', winnerIndex);
 
     // Update UI to reflect the changes
     setState(() {
@@ -303,6 +277,7 @@ class _PlaywithCompState extends State<PlaywithComp> {
       updatePlayerCards(player4, player4);
     });
   }
+
 
 
   void currentSuitPlayed(CardSuit suit) {
@@ -326,10 +301,17 @@ class _PlaywithCompState extends State<PlaywithComp> {
     }
   }
 
+  // Function to find the winner of the current round
+  int findRoundWinner() {
+    // Implement your logic to determine the winner of the round
+    // For now, let's assume player 4 always wins the round
+    return 3; // Player 4 index
+  }
 
 
   @override
   Widget build(BuildContext context) {
+    String roundResultText = '';
     // Printing scores when the build method is called
     print('Player 1 Score: $player1Score');
     print('Player 2 Score: $player2Score');
@@ -379,7 +361,11 @@ class _PlaywithCompState extends State<PlaywithComp> {
                 PlayingCard selectedCard = throwCards[0];
 
                 // Remove the selected card from Player 1's hand
+                // Remove the selected card from all players' hands
                 player1.remove(throwCards[0]);
+                player2.remove(throwCards[1]);
+                player3.remove(throwCards[2]);
+                player4.remove(throwCards[3]);
 
                 // Update the top cards from each player's hand in throwCards
                 // throwCards[1] = player2.isNotEmpty ? player2[0] : throwCards[1];
@@ -439,16 +425,38 @@ class _PlaywithCompState extends State<PlaywithComp> {
                 return GestureDetector(
                   onTap: () {
                     PlayingCard tappedCard = player1[index];
-                    suitToEnable = throwCards[0].cardSuit;
-                    if (tappedCard.cardSuit == suitToEnable) {
+                    if (!playedround1 || tappedCard.cardSuit == suitToEnable) {
                       setState(() {
+                        // Update the card played by Player 1
                         throwCards[0] = tappedCard;
-                        int highestIndex = biggerCard(throwCards); // Call with only one argument
-                        if (highestIndex >= 0) {
-                          //showCardComparisonDialog('${throwCards[highestIndex].printCardInfo(throwCards[highestIndex])} is bigger');
-                          currentSuitPlayed(tappedCard.cardSuit);
+
+                        // Update suitToEnable if it's the first round
+                        if (!playedround1) {
+                          suitToEnable = tappedCard.cardSuit;
                         }
+
+                        // Determine the winner of the round
+                        int winnerIndex = biggerCard(throwCards);
+
+                        // Display the result in an AlertDialog
+                        //showCardComparisonDialog('${throwCards[winnerIndex].printCardInfo(throwCards[winnerIndex])} is bigger', winnerIndex);
+
+                        // Remove the played card from Player 1's hand
+                        player1.remove(tappedCard);
+
+                        // Remove the played card from all players' hands
+                        player2.remove(throwCards[1]);
+                        player3.remove(throwCards[2]);
+                        player4.remove(throwCards[3]);
+
+                        // Update the top cards from each player's hand in throwCards
+                        throwCards[1] = player2.isNotEmpty ? player2[0] : throwCards[1];
+                        throwCards[2] = player3.isNotEmpty ? player3[0] : throwCards[2];
+                        throwCards[3] = player4.isNotEmpty ? player4[0] : throwCards[3];
                       });
+                    } else {
+                      // If it's not the first round and the selected card's suit is not the same as the suitToEnable, prevent the player from selecting a card
+                      // Optionally, you can show a message or disable interaction here
                     }
                   },
                   child: Padding(
