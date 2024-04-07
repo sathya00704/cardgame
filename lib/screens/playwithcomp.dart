@@ -23,6 +23,8 @@ class _PlaywithCompState extends State<PlaywithComp> {
   int player2Score = 0;
   int player3Score = 0;
   int player4Score = 0;
+  int lastRoundWinner = 0;
+  int roundscompleted = 0;
 
   // Define suitToEnable variable to store the suit of the first card played
   CardSuit suitToEnable = CardSuit.spades;
@@ -228,11 +230,11 @@ class _PlaywithCompState extends State<PlaywithComp> {
 
     throwCards = [player1[0], player2[0], player3[0], player4[0]];
     //print('player[0]=${player1[0]}');
-    findSimilarSuitCard(player1, player2, player3, player4);
+    findSimilarSuitCard(player1, player2, player3, player4); //Used to segregate the cards as per suits
 
-    printPlayerCards(player2, "Player 2");
-    printPlayerCards(player3, "Player 3");
-    printPlayerCards(player4, "Player 4");
+    //printPlayerCards(player2, "Player 2");
+    //printPlayerCards(player3, "Player 3");
+    //printPlayerCards(player4, "Player 4");
   }
 
   void showCardComparisonDialog(String message, int playerIndex) {
@@ -240,6 +242,19 @@ class _PlaywithCompState extends State<PlaywithComp> {
     Future.delayed(Duration.zero, () {
       // Print the index of the winning player
       print('Winner: Player ${playerIndex + 1}');
+      if (playerIndex==0) {
+        player1Score+=1;
+      }
+      if (playerIndex==1) {
+        player2Score+=1;
+      }
+      if (playerIndex==2) {
+        player3Score+=1;
+      }
+      if (playerIndex==3) {
+        player4Score+=1;
+      }
+      playerScore();
 
       // Show the dialog after updating the state
       showDialog(
@@ -270,27 +285,6 @@ class _PlaywithCompState extends State<PlaywithComp> {
     });
   }
 
-  void currentSuitPlayed(CardSuit suit) {
-    // Determine the index of the suit in the p2_s list
-    int suitIndex = suit.index;
-
-    // Get the sublist corresponding to the suit
-    List<PlayingCard> suitSublist = p2_s[suitIndex];
-    print('suitsublist = $suitSublist');
-
-    // Check if the sublist is not empty
-    if (suitSublist.isNotEmpty) {
-      // Play the first card from the sublist
-      PlayingCard playedCard = suitSublist.first;
-
-      // Remove the played card from the sublist
-      suitSublist.removeAt(0);
-
-      // Update UI to reflect the played card
-      // You need to implement UI update logic here
-    }
-  }
-
   // Function to find the winner of the current round
   int findRoundWinner(int playerIndex) {
     if (playerIndex == 0) {
@@ -310,14 +304,6 @@ class _PlaywithCompState extends State<PlaywithComp> {
     // For now, let's assume player 4 always wins the round
   }
 
-  void roundN(int roundNumber) {
-    // Rounds 2 to 13 logic (same for each round)
-    // For example:
-    // Determine starting player based on previous round's winner
-    // Players play their cards accordingly
-    // Determine the winner and update scores
-  }
-
   void playerScore() {
     // Printing scores when the build method is called
     print('Player 1 Score: $player1Score');
@@ -331,148 +317,26 @@ class _PlaywithCompState extends State<PlaywithComp> {
   Widget build(BuildContext context) {
     String roundResultText = '';
     return Scaffold(
-      backgroundColor: Colors.green,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-              ),
-              itemCount: throwCards.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Center(
-                      child: Image.asset(
-                        getCardImagePath(throwCards[index]),
-                        width: 200,
-                        height: 150,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
+      backgroundColor: Colors.transparent, // Set the scaffold background color to transparent
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/bg2.jpg'), // Replace 'background_image.jpg' with your image asset
+            fit: BoxFit.cover,
           ),
-          Align(
-            alignment: Alignment.topRight,
-            child: ElevatedButton(
-              onPressed: () {
-                //print('Button pressed');
-                playedround1 = true;
-                print('played=$playedround1');
-
-                // Get the selected card from Player 1's hand
-                PlayingCard selectedCard = throwCards[0];
-
-                // Remove the selected card from Player 1's hand
-                // Remove the selected card from all players' hands
-                player1.remove(throwCards[0]);
-                player2.remove(throwCards[1]);
-                player3.remove(throwCards[2]);
-                player4.remove(throwCards[3]);
-
-                // Update the top cards from each player's hand in throwCards
-                // throwCards[1] = player2.isNotEmpty ? player2[0] : throwCards[1];
-                // throwCards[2] = player3.isNotEmpty ? player3[0] : throwCards[2];
-                // throwCards[3] = player4.isNotEmpty ? player4[0] : throwCards[3];
-                // Update the top cards from each player's hand in throwCards with the highest card of the current suit
-                // Update the top cards from each player's hand in throwCards with the highest card of the current suit
-                throwCards[1] = player2[throwCards[0].cardSuit.index] != null && p2_s[throwCards[0].cardSuit.index].isNotEmpty ? p2_s[throwCards[0].cardSuit.index][0] : throwCards[1];
-                throwCards[2] = player3[throwCards[0].cardSuit.index] != null && p3_s[throwCards[0].cardSuit.index].isNotEmpty ? p3_s[throwCards[0].cardSuit.index][0] : throwCards[2];
-                throwCards[3] = player4[throwCards[0].cardSuit.index] != null && p4_s[throwCards[0].cardSuit.index].isNotEmpty ? p4_s[throwCards[0].cardSuit.index][0] : throwCards[3];
-
-                // Update UI to reflect the changes
-                setState(() {
-                  // Update throwCards with the selected card from Player 1 and top cards from other players
-                  throwCards[1] = throwCards[1]; // Update the top card with Player 2's card
-                  throwCards[2] = throwCards[2]; // Update Player 2's card with Player 3's card
-                  throwCards[3] = throwCards[3]; // Update Player 3's card with Player 4's card
-                });
-
-
-                // Call the game logic or any other necessary functions
-                // Here you can call functions like biggerCard() or findSimilarSuitCard() as needed
-                // For example:
-                int? highestIndex = biggerCard(throwCards);
-                if (highestIndex != null) {
-                  // Display the result in an AlertDialog
-                  setState(() {
-                    showCardComparisonDialog('${throwCards[highestIndex].printCardInfo(throwCards[highestIndex])} is bigger', highestIndex);
-                  });
-                } else {
-                  // No card played yet, handle this case accordingly
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                primary: Colors.white,
-                padding: EdgeInsets.zero, // No padding around the button
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
                 ),
-              ),
-              child: Text(
-                'PASS',
-                style: TextStyle(
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ),
-
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 7,
-              ),
-              itemCount: player1.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    PlayingCard tappedCard = player1[index];
-                    if (!playedround1 || tappedCard.cardSuit == suitToEnable) {
-                      setState(() {
-                        // Update the card played by Player 1
-                        throwCards[0] = tappedCard;
-
-                        // Update suitToEnable if it's the first round
-                        if (!playedround1) {
-                          suitToEnable = tappedCard.cardSuit;
-                        }
-
-                        // Determine the winner of the round
-                        int winnerIndex = biggerCard(throwCards);
-
-                        // Display the result in an AlertDialog
-                        //showCardComparisonDialog('${throwCards[winnerIndex].printCardInfo(throwCards[winnerIndex])} is bigger', winnerIndex);
-
-                        // Remove the played card from Player 1's hand
-                        player1.remove(tappedCard);
-
-                        // Remove the played card from all players' hands
-                        player2.remove(throwCards[1]);
-                        player3.remove(throwCards[2]);
-                        player4.remove(throwCards[3]);
-
-                        // Update the top cards from each player's hand in throwCards
-                        throwCards[1] = player2.isNotEmpty ? player2[0] : throwCards[1];
-                        throwCards[2] = player3.isNotEmpty ? player3[0] : throwCards[2];
-                        throwCards[3] = player4.isNotEmpty ? player4[0] : throwCards[3];
-                      });
-                    } else {
-                      // If it's not the first round and the selected card's suit is not the same as the suitToEnable, prevent the player from selecting a card
-                      // Optionally, you can show a message or disable interaction here
-                    }
-                  },
-                  child: Padding(
+                itemCount: throwCards.length,
+                itemBuilder: (context, index) {
+                  return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
                       decoration: BoxDecoration(
@@ -481,18 +345,144 @@ class _PlaywithCompState extends State<PlaywithComp> {
                       ),
                       child: Center(
                         child: Image.asset(
-                          getCardImagePath(player1[index]),
-                          width: 100,
-                          height: 100,
+                          getCardImagePath(throwCards[index]),
+                          width: 200,
+                          height: 150,
                         ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+            Row( // Row to contain the "Player 1 Cards" text and the PASS button
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                  child: Text(
+                    'Your Cards:',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Get the selected card from Player 1's hand
+                    PlayingCard selectedCard = throwCards[0];
+
+                    // // Remove the selected card from Player 1's hand
+                    player1.remove(throwCards[0]);
+                    player2.remove(throwCards[1]);
+                    player3.remove(throwCards[2]);
+                    player4.remove(throwCards[3]);
+
+                    throwCards[1] = player2[selectedCard.cardSuit.index] != null && p2_s[selectedCard.cardSuit.index].isNotEmpty ? p2_s[selectedCard.cardSuit.index].removeAt(0) : throwCards[1];
+                    throwCards[2] = player3[selectedCard.cardSuit.index] != null && p3_s[selectedCard.cardSuit.index].isNotEmpty ? p3_s[selectedCard.cardSuit.index].removeAt(0) : throwCards[2];
+                    throwCards[3] = player4[selectedCard.cardSuit.index] != null && p4_s[selectedCard.cardSuit.index].isNotEmpty ? p4_s[selectedCard.cardSuit.index].removeAt(0) : throwCards[3];
+
+                    // Update UI to reflect the changes
+                    setState(() {
+                      // Update throwCards with the selected card from Player 1 and top cards from other players
+                      throwCards[1] = throwCards[1]; // Update the top card with Player 2's card
+                      throwCards[2] = throwCards[2]; // Update Player 2's card with Player 3's card
+                      throwCards[3] = throwCards[3]; // Update Player 3's card with Player 4's card
+                    });
+
+                    // Call the game logic or any other necessary functions
+                    // Here you can call functions like biggerCard() or findSimilarSuitCard() as needed
+                    // For example:
+                    int? highestIndex = biggerCard(throwCards);
+                    if (highestIndex != null) {
+                      // Display the result in an AlertDialog
+                      setState(() {
+                        showCardComparisonDialog('${throwCards[highestIndex].printCardInfo(throwCards[highestIndex])} is bigger', highestIndex);
+                        lastRoundWinner = findRoundWinner(highestIndex);
+                        roundscompleted=1;
+                      });
+                    } else {
+                      print('Check again!!');
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.white,
+                    padding: EdgeInsets.zero, // No padding around the button
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  child: Text(
+                    'PASS',
+                    style: TextStyle(
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 7,
+                ),
+                itemCount: player1.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      PlayingCard tappedCard = player1[index];
+                      if (!playedround1 || tappedCard.cardSuit == suitToEnable) {
+                        setState(() {
+                          // Update the card played by Player 1
+                          throwCards[0] = tappedCard;
+
+                          // Update suitToEnable if it's the first round
+                          if (!playedround1) {
+                            suitToEnable = tappedCard.cardSuit;
+                          }
+
+                          // Remove the played card from all players' hands
+                          player1.remove(throwCards[0]);
+
+                          // Ensure that indices are within bounds before accessing throwCards
+                          if (throwCards.length > 1) {
+                            player2.remove(throwCards[1]);
+                          }
+                          if (throwCards.length > 2) {
+                            player3.remove(throwCards[2]);
+                          }
+                          if (throwCards.length > 3) {
+                            player4.remove(throwCards[3]);
+                          }
+                        });
+                      } else {
+                        // If it's not the first round and the selected card's suit is not the same as the suitToEnable, prevent the player from selecting a card
+                        // Optionally, you can show a message or disable interaction here
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: Center(
+                          child: Image.asset(
+                            getCardImagePath(player1[index]),
+                            width: 100,
+                            height: 100,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
