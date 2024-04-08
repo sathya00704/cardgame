@@ -23,6 +23,7 @@ class _PlaywithCompState extends State<PlaywithComp> {
   int player2Score = 0;
   int player3Score = 0;
   int player4Score = 0;
+  List eachRoundScore = [];
   int lastRoundWinner = 0;
   int roundscompleted = 0;
 
@@ -312,6 +313,42 @@ class _PlaywithCompState extends State<PlaywithComp> {
     print('Player 4 Score: $player4Score');
   }
 
+  int scoreValue(List<PlayingCard> cards) {
+    // Define the priority order of card types with corresponding scores
+    Map<CardType, int> priorityOrder = {
+      CardType.ace: 140,
+      CardType.king: 130,
+      CardType.queen: 120,
+      CardType.jack: 110,
+      CardType.ten: 100,
+      CardType.nine: 90,
+      CardType.eight: 80,
+      CardType.seven: 70,
+      CardType.six: 60,
+      CardType.five: 50,
+      CardType.four: 40,
+      CardType.three: 30,
+      CardType.two: 20,
+    };
+
+    // Initialize variable to store the total score
+    int totalScore = 0;
+
+    // Iterate through the cards to calculate the total score
+    for (PlayingCard card in cards) {
+      // Get the score of the current card type
+      int cardScore = priorityOrder[card.cardType] ?? 0;
+
+      // Add the score of the current card to the total score
+      totalScore += cardScore;
+    }
+
+    // Return the total score
+    return totalScore;
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -395,6 +432,8 @@ class _PlaywithCompState extends State<PlaywithComp> {
                     // Here you can call functions like biggerCard() or findSimilarSuitCard() as needed
                     // For example:
                     int? highestIndex = biggerCard(throwCards);
+                    int? currentRoundScore = scoreValue(throwCards);
+                    print('CurrentRoundScore = $currentRoundScore');
                     if (highestIndex != null) {
                       // Display the result in an AlertDialog
                       setState(() {

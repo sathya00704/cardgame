@@ -40,7 +40,7 @@ class _HomeState extends State<Home> {
                   ),
                 ),
                 SizedBox(width: 8), // Add some space between the image and text
-                Text('Casino game', style: TextStyle(color: Colors.black)),
+                Text('CASINO', style: TextStyle(color: Colors.black)),
               ],
             ),
             centerTitle: true,
