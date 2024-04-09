@@ -243,19 +243,6 @@ class _PlaywithCompState extends State<PlaywithComp> {
     Future.delayed(Duration.zero, () {
       // Print the index of the winning player
       print('Winner: Player ${playerIndex + 1}');
-      if (playerIndex==0) {
-        player1Score+=1;
-      }
-      if (playerIndex==1) {
-        player2Score+=1;
-      }
-      if (playerIndex==2) {
-        player3Score+=1;
-      }
-      if (playerIndex==3) {
-        player4Score+=1;
-      }
-      playerScore();
 
       // Show the dialog after updating the state
       showDialog(
@@ -347,12 +334,29 @@ class _PlaywithCompState extends State<PlaywithComp> {
     return totalScore;
   }
 
+  int findMaxScore() {
+    // Find the maximum score among player1, player2, player3, and player4 scores
+    int maxScore = player1Score;
+    if (player2Score > maxScore) {
+      maxScore = player2Score;
+    }
+    if (player3Score > maxScore) {
+      maxScore = player3Score;
+    }
+    if (player4Score > maxScore) {
+      maxScore = player4Score;
+    }
+    return maxScore;
+  }
+
+
 
 
 
   @override
   Widget build(BuildContext context) {
     String roundResultText = '';
+
     return Scaffold(
       backgroundColor: Colors.transparent, // Set the scaffold background color to transparent
       body: Container(
@@ -434,6 +438,21 @@ class _PlaywithCompState extends State<PlaywithComp> {
                     int? highestIndex = biggerCard(throwCards);
                     int? currentRoundScore = scoreValue(throwCards);
                     print('CurrentRoundScore = $currentRoundScore');
+                    if (highestIndex==0) {
+                      player1Score+=currentRoundScore;
+                    }
+                    if (highestIndex==1) {
+                      player2Score+=currentRoundScore;
+                    }
+                    if (highestIndex==2) {
+                      player3Score+=currentRoundScore;
+                    }
+                    if (highestIndex==3) {
+                      player4Score+=currentRoundScore;
+                    }
+                    playerScore();
+                    int maxScore = findMaxScore();
+                    print('Maximum score among players: $maxScore');
                     if (highestIndex != null) {
                       // Display the result in an AlertDialog
                       setState(() {
