@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cardgame/models/cards.dart';
 import 'dart:math';
+import 'dart:async'; // Import the async library
 
 class PlaywithComp extends StatefulWidget {
   @override
@@ -26,6 +27,9 @@ class _PlaywithCompState extends State<PlaywithComp> {
   List eachRoundScore = [];
   int lastRoundWinner = 0;
   int roundscompleted = 0;
+
+  List<bool> playersArray = List.filled(4, false);
+
 
   // Define suitToEnable variable to store the suit of the first card played
   CardSuit suitToEnable = CardSuit.spades;
@@ -215,6 +219,7 @@ class _PlaywithCompState extends State<PlaywithComp> {
     printSegregatedAndSortedCards(p2_s, 'Player 2');
     printSegregatedAndSortedCards(p3_s, 'Player 3');
     printSegregatedAndSortedCards(p4_s, 'Player 4');
+
   }
 
   void printPlayerCards(List<PlayingCard> cards, String playerName) {
@@ -238,40 +243,41 @@ class _PlaywithCompState extends State<PlaywithComp> {
     //printPlayerCards(player4, "Player 4");
   }
 
-  void showCardComparisonDialog(String message, int playerIndex) {
-    // Schedule the state update after the build method completes
-    Future.delayed(Duration.zero, () {
-      // Print the index of the winning player
-      print('Winner: Player ${playerIndex + 1}');
+  void showCardComparisonDialog(PlayingCard winningCard, int playerIndex) {
+    // Show the dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dialog from closing on tap outside
+      builder: (BuildContext context) {
+        // Create a Timer to automatically dismiss the dialog after 3 seconds
+        Timer(Duration(seconds: 1), () {
+          Navigator.of(context).pop(); // Close the dialog
+        });
 
-      // Show the dialog after updating the state
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Card Comparison Result'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(message),
-                SizedBox(height: 10),
-                Text('Played by Player ${playerIndex + 1}'),
-              ],
-            ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                },
-                child: Text('OK'),
+        // Return the AlertDialog widget
+        return AlertDialog(
+          title: Text('Card Comparison Result'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              //Text('${winningCard.printCardInfo(winningCard)} is bigger'),
+              //SizedBox(height: 10),
+              Text('Played by Player ${playerIndex + 1}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+              SizedBox(height: 10),
+              Image.asset(
+                getCardImagePath(winningCard),
+                width: 100,
+                height: 100,
               ),
             ],
-          );
-        },
-      );
-    });
+          ),
+        );
+      },
+    );
   }
+
+
 
   // Function to find the winner of the current round
   int findRoundWinner(int playerIndex) {
@@ -348,10 +354,6 @@ class _PlaywithCompState extends State<PlaywithComp> {
     }
     return maxScore;
   }
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -453,12 +455,13 @@ class _PlaywithCompState extends State<PlaywithComp> {
                     playerScore();
                     int maxScore = findMaxScore();
                     print('Maximum score among players: $maxScore');
+                    print('Rounds completed = $roundscompleted');
                     if (highestIndex != null) {
                       // Display the result in an AlertDialog
                       setState(() {
-                        showCardComparisonDialog('${throwCards[highestIndex].printCardInfo(throwCards[highestIndex])} is bigger', highestIndex);
+                        showCardComparisonDialog(throwCards[highestIndex], highestIndex);
                         lastRoundWinner = findRoundWinner(highestIndex);
-                        roundscompleted=1;
+                        roundscompleted++;
                       });
                     } else {
                       print('Check again!!');
