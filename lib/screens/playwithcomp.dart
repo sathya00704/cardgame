@@ -28,6 +28,12 @@ class _PlaywithCompState extends State<PlaywithComp> {
   int lastRoundWinner = 0;
   int roundscompleted = 0;
 
+  // Boolean variables to determine whether to show or hide the top card for each player
+  bool showPlayer1Card = false;
+  bool showPlayer2Card = false;
+  bool showPlayer3Card = false;
+  bool showPlayer4Card = false;
+
   List<bool> playersArray = List.filled(4, false);
 
 
@@ -382,16 +388,25 @@ class _PlaywithCompState extends State<PlaywithComp> {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
+                      decoration: index < 4 ? BoxDecoration(color: Colors.white) : BoxDecoration(),
                       child: Center(
-                        child: Image.asset(
+                        child: index == 0 && showPlayer1Card ? Image.asset(
                           getCardImagePath(throwCards[index]),
                           width: 200,
                           height: 150,
-                        ),
+                        ) : index == 1 && showPlayer2Card ? Image.asset(
+                          getCardImagePath(throwCards[index]),
+                          width: 200,
+                          height: 150,
+                        ) : index == 2 && showPlayer3Card ? Image.asset(
+                          getCardImagePath(throwCards[index]),
+                          width: 200,
+                          height: 150,
+                        ) : index == 3 && showPlayer4Card ? Image.asset(
+                          getCardImagePath(throwCards[index]),
+                          width: 200,
+                          height: 150,
+                        ) : Container(), // Show an empty container if the card should be hidden
                       ),
                     ),
                   );
@@ -413,6 +428,12 @@ class _PlaywithCompState extends State<PlaywithComp> {
                 ),
                 ElevatedButton(
                   onPressed: () {
+
+                    setState(() {
+                      showPlayer2Card = true;
+                      showPlayer3Card = true;
+                      showPlayer4Card = true;
+                    });
                     // Get the selected card from Player 1's hand
                     PlayingCard selectedCard = throwCards[0];
 
@@ -493,6 +514,12 @@ class _PlaywithCompState extends State<PlaywithComp> {
                   return GestureDetector(
                     onTap: () {
                       PlayingCard tappedCard = player1[index];
+
+                      print('Cards with Player-1 ${player1.length}');
+                      print('Cards with Player-2 ${player2.length}');
+                      print('Cards with Player-3 ${player3.length}');
+                      print('Cards with Player-4 ${player4.length}');
+
                       if (!playedround1 || tappedCard.cardSuit == suitToEnable) {
                         setState(() {
                           // Update the card played by Player 1
@@ -503,19 +530,8 @@ class _PlaywithCompState extends State<PlaywithComp> {
                             suitToEnable = tappedCard.cardSuit;
                           }
 
-                          // Remove the played card from all players' hands
-                          player1.remove(throwCards[0]);
-
-                          // Ensure that indices are within bounds before accessing throwCards
-                          if (throwCards.length > 1) {
-                            player2.remove(throwCards[1]);
-                          }
-                          if (throwCards.length > 2) {
-                            player3.remove(throwCards[2]);
-                          }
-                          if (throwCards.length > 3) {
-                            player4.remove(throwCards[3]);
-                          }
+                          // Update UI to show the selected card on the top player card
+                          showPlayer1Card = true;
                         });
                       } else {
                         // If it's not the first round and the selected card's suit is not the same as the suitToEnable, prevent the player from selecting a card
