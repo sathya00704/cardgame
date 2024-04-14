@@ -1,6 +1,9 @@
+import 'package:cardgame/screens/cartscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:cardgame/constants/constants.dart';
 import 'package:cardgame/screens/playwithcomp.dart';
+import 'package:cardgame/screens/playwithfriends.dart';
+
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -74,6 +77,10 @@ class _HomeState extends State<Home> {
                     ElevatedButton(
                       onPressed: () {
                         print('play with friends button');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => PlayWithFriends()),
+                        );
                       },
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.green[800], elevation: 10),
                       child: Text(
@@ -184,7 +191,13 @@ class _HomeState extends State<Home> {
 
                       SizedBox(height: 20),
                       FloatingActionButton(
-                        onPressed: () {print('cart icon (to buy)');},
+                        onPressed: () {
+                          print('cart icon (to buy)');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => CartScreen()),
+                          );
+                          },
                         mini: true,
                         backgroundColor: Colors.black,
                         child: Icon(Icons.shopping_cart, size: 30, color: Colors.white),

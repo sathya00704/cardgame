@@ -249,27 +249,20 @@ class _PlaywithCompState extends State<PlaywithComp> {
     //printPlayerCards(player4, "Player 4");
   }
 
-  void showCardComparisonDialog(PlayingCard winningCard, int playerIndex) {
+  void showCardComparisonDialog(PlayingCard winningCard, int highestIndex) {
     // Show the dialog
     showDialog(
       context: context,
       barrierDismissible: false, // Prevent dialog from closing on tap outside
       builder: (BuildContext context) {
-        // Create a Timer to automatically dismiss the dialog after 3 seconds
-        Timer(Duration(seconds: 1), () {
-          Navigator.of(context).pop(); // Close the dialog
-        });
-
         // Return the AlertDialog widget
         return AlertDialog(
-          title: Text('Card Comparison Result'),
+          title: Text('Round Winner-'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //Text('${winningCard.printCardInfo(winningCard)} is bigger'),
-              //SizedBox(height: 10),
-              Text('Played by Player ${playerIndex + 1}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+              Text('Round won by Player ${highestIndex + 1} \nCard Played: ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
               SizedBox(height: 10),
               Image.asset(
                 getCardImagePath(winningCard),
@@ -281,7 +274,45 @@ class _PlaywithCompState extends State<PlaywithComp> {
         );
       },
     );
+
+    // Start a timer to dismiss the dialog after 1 second
+    Timer(Duration(seconds: 3), () {
+      // Close the dialog
+      Navigator.of(context).pop();
+
+      if (lastRoundWinner == 4) {
+        //throwCards[3] = player4[Random().nextInt(player4.length)];
+        setState(() {
+          showPlayer1Card = false;
+          showPlayer2Card = false;
+          showPlayer3Card = false;
+        });
+      } else if (lastRoundWinner == 3) {
+        //throwCards[2] = player3[Random().nextInt(player3.length)];
+        setState(() {
+          showPlayer1Card = false;
+          showPlayer2Card = false;
+          showPlayer4Card = false;
+        });
+      } else if (lastRoundWinner == 2) {
+        //throwCards[1] = player2[Random().nextInt(player2.length)];
+        setState(() {
+          showPlayer1Card = false;
+          showPlayer3Card = false;
+          showPlayer4Card = false;
+        });
+      }
+      else { //Player 1 is the winner
+        setState(() {
+          showPlayer1Card = false;
+          showPlayer2Card = false;
+          showPlayer3Card = false;
+          showPlayer4Card = false;
+        });
+      }
+    });
   }
+
 
 
 
@@ -417,7 +448,7 @@ class _PlaywithCompState extends State<PlaywithComp> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                   child: Text(
                     'Your Cards:',
                     style: TextStyle(
@@ -426,79 +457,106 @@ class _PlaywithCompState extends State<PlaywithComp> {
                     ),
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                  child: ElevatedButton(
+                    onPressed: showPlayer1Card ? () {
 
-                    setState(() {
-                      showPlayer2Card = true;
-                      showPlayer3Card = true;
-                      showPlayer4Card = true;
-                    });
-                    // Get the selected card from Player 1's hand
-                    PlayingCard selectedCard = throwCards[0];
-
-                    // // Remove the selected card from Player 1's hand
-                    player1.remove(throwCards[0]);
-                    player2.remove(throwCards[1]);
-                    player3.remove(throwCards[2]);
-                    player4.remove(throwCards[3]);
-
-                    throwCards[1] = player2[selectedCard.cardSuit.index] != null && p2_s[selectedCard.cardSuit.index].isNotEmpty ? p2_s[selectedCard.cardSuit.index].removeAt(0) : throwCards[1];
-                    throwCards[2] = player3[selectedCard.cardSuit.index] != null && p3_s[selectedCard.cardSuit.index].isNotEmpty ? p3_s[selectedCard.cardSuit.index].removeAt(0) : throwCards[2];
-                    throwCards[3] = player4[selectedCard.cardSuit.index] != null && p4_s[selectedCard.cardSuit.index].isNotEmpty ? p4_s[selectedCard.cardSuit.index].removeAt(0) : throwCards[3];
-
-                    // Update UI to reflect the changes
-                    setState(() {
-                      // Update throwCards with the selected card from Player 1 and top cards from other players
-                      throwCards[1] = throwCards[1]; // Update the top card with Player 2's card
-                      throwCards[2] = throwCards[2]; // Update Player 2's card with Player 3's card
-                      throwCards[3] = throwCards[3]; // Update Player 3's card with Player 4's card
-                    });
-
-                    // Call the game logic or any other necessary functions
-                    // Here you can call functions like biggerCard() or findSimilarSuitCard() as needed
-                    // For example:
-                    int? highestIndex = biggerCard(throwCards);
-                    int? currentRoundScore = scoreValue(throwCards);
-                    print('CurrentRoundScore = $currentRoundScore');
-                    if (highestIndex==0) {
-                      player1Score+=currentRoundScore;
-                    }
-                    if (highestIndex==1) {
-                      player2Score+=currentRoundScore;
-                    }
-                    if (highestIndex==2) {
-                      player3Score+=currentRoundScore;
-                    }
-                    if (highestIndex==3) {
-                      player4Score+=currentRoundScore;
-                    }
-                    playerScore();
-                    int maxScore = findMaxScore();
-                    print('Maximum score among players: $maxScore');
-                    print('Rounds completed = $roundscompleted');
-                    if (highestIndex != null) {
-                      // Display the result in an AlertDialog
                       setState(() {
-                        showCardComparisonDialog(throwCards[highestIndex], highestIndex);
-                        lastRoundWinner = findRoundWinner(highestIndex);
-                        roundscompleted++;
+                        showPlayer1Card = true;
+                        showPlayer2Card = true;
+                        showPlayer3Card = true;
+                        showPlayer4Card = true;
+
+                        playersArray[0] = false;
+                        playersArray[1] = false;
+                        playersArray[2] = false;
+                        playersArray[3] = false;
                       });
-                    } else {
-                      print('Check again!!');
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.white,
-                    padding: EdgeInsets.zero, // No padding around the button
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
+                      // Get the selected card from Player 1's hand
+                      PlayingCard selectedCard = throwCards[0];
+
+                      // // Remove the selected card from Player 1's hand
+                      player1.remove(throwCards[0]);
+                      player2.remove(throwCards[1]);
+                      player3.remove(throwCards[2]);
+                      player4.remove(throwCards[3]);
+
+                      throwCards[1] = player2[selectedCard.cardSuit.index] != null && p2_s[selectedCard.cardSuit.index].isNotEmpty ? p2_s[selectedCard.cardSuit.index].removeAt(0) : throwCards[1];
+                      throwCards[2] = player3[selectedCard.cardSuit.index] != null && p3_s[selectedCard.cardSuit.index].isNotEmpty ? p3_s[selectedCard.cardSuit.index].removeAt(0) : throwCards[2];
+                      throwCards[3] = player4[selectedCard.cardSuit.index] != null && p4_s[selectedCard.cardSuit.index].isNotEmpty ? p4_s[selectedCard.cardSuit.index].removeAt(0) : throwCards[3];
+
+                      // Update UI to reflect the changes
+                      setState(() {
+                        // Update throwCards with the selected card from Player 1 and top cards from other players
+                        throwCards[1] = throwCards[1]; // Update the top card with Player 2's card
+                        throwCards[2] = throwCards[2]; // Update Player 2's card with Player 3's card
+                        throwCards[3] = throwCards[3]; // Update Player 3's card with Player 4's card
+                      });
+
+                      // Call the game logic or any other necessary functions
+                      // Here you can call functions like biggerCard() or findSimilarSuitCard() as needed
+                      // For example:
+                      int? highestIndex = biggerCard(throwCards);
+                      int? currentRoundScore = scoreValue(throwCards);
+                      print('CurrentRoundScore = $currentRoundScore');
+                      if (highestIndex==0) {
+                        player1Score+=currentRoundScore;
+                      }
+                      if (highestIndex==1) {
+                        player2Score+=currentRoundScore;
+                      }
+                      if (highestIndex==2) {
+                        player3Score+=currentRoundScore;
+                      }
+                      if (highestIndex==3) {
+                        player4Score+=currentRoundScore;
+                      }
+                      playerScore();
+                      int maxScore = findMaxScore();
+                      print('Maximum score among players: $maxScore');
+                      print('Rounds completed = $roundscompleted');
+                      if (highestIndex != null) {
+                        // Display the result in an AlertDialog
+                        setState(() {
+                          showCardComparisonDialog(throwCards[highestIndex], highestIndex);
+                          lastRoundWinner = findRoundWinner(highestIndex);
+                          roundscompleted++;
+
+                          // If player 4 wins the round, update throwCards with a random card from player4's array
+                          setState(() {
+                            if (lastRoundWinner == 4) {
+                              throwCards[3] = player4[Random().nextInt(player4.length)];
+                            }
+                            // If player 3 wins the round, update throwCards with a random card from player3's array
+                            if (lastRoundWinner == 3) {
+                              throwCards[2] = player3[Random().nextInt(player3.length)];
+                            }
+                            if (lastRoundWinner == 2) {
+                              throwCards[1] = player2[Random().nextInt(player2.length)];
+                            }
+                          });
+                        });
+                      } else {
+                        print('Check again!!');
+                      }
+                      }: null,
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.white,
+                      padding: EdgeInsets.zero, // No padding around the button
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    'PASS',
-                    style: TextStyle(
-                      color: Colors.black,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'NEXT >>',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                        ),
+                      ),
                     ),
                   ),
                 ),
