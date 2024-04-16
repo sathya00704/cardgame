@@ -276,7 +276,7 @@ class _PlaywithCompState extends State<PlaywithComp> {
     );
 
     // Start a timer to dismiss the dialog after 1 second
-    Timer(Duration(seconds: 3), () {
+    Timer(Duration(seconds: 1), () {
       // Close the dialog
       Navigator.of(context).pop();
 
@@ -390,6 +390,41 @@ class _PlaywithCompState extends State<PlaywithComp> {
       maxScore = player4Score;
     }
     return maxScore;
+  }
+
+  void showWinnerDialog() {
+    // Find the player with the highest score
+    int maxScore = findMaxScore();
+    String winner;
+    if (maxScore == player1Score) {
+      winner = 'Player 1';
+    } else if (maxScore == player2Score) {
+      winner = 'Player 2';
+    } else if (maxScore == player3Score) {
+      winner = 'Player 3';
+    } else {
+      winner = 'Player 4';
+    }
+
+    // Show the winner in an AlertDialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Game Over'),
+          content: Text('The winner is $winner with a score of $maxScore.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Reset the game or navigate to another screen
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -515,6 +550,12 @@ class _PlaywithCompState extends State<PlaywithComp> {
                       playerScore();
                       int maxScore = findMaxScore();
                       print('Maximum score among players: $maxScore');
+
+                      // Call showWinnerDialog() when any of the player's card list becomes empty
+                      if (player1.isEmpty || player2.isEmpty || player3.isEmpty || player4.isEmpty) {
+                        showWinnerDialog();
+                      }
+
                       print('Rounds completed = $roundscompleted');
                       if (highestIndex != null) {
                         // Display the result in an AlertDialog
@@ -540,7 +581,7 @@ class _PlaywithCompState extends State<PlaywithComp> {
                       } else {
                         print('Check again!!');
                       }
-                      }: null,
+                    }: null,
                     style: ElevatedButton.styleFrom(
                       primary: Colors.white,
                       padding: EdgeInsets.zero, // No padding around the button
