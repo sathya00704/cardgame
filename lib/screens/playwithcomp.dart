@@ -1,3 +1,4 @@
+import 'package:cardgame/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:cardgame/models/cards.dart';
 import 'dart:math';
@@ -392,6 +393,13 @@ class _PlaywithCompState extends State<PlaywithComp> {
     return maxScore;
   }
 
+  void suitenabler([int currplayer = 0]) {
+    // Update suitToEnable if any of the showPlayerXCard is true
+    int index = currplayer;
+    suitToEnable = throwCards[index].cardSuit;
+    print('inside fnc = $suitToEnable');
+  }
+
   void showWinnerDialog() {
     // Find the player with the highest score
     int maxScore = findMaxScore();
@@ -416,11 +424,15 @@ class _PlaywithCompState extends State<PlaywithComp> {
           actions: [
             TextButton(
               onPressed: () {
-                // Reset the game or navigate to another screen
-                Navigator.of(context).pop();
+                // Navigate back to the home page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Home()),
+                );
               },
               child: Text('OK'),
             ),
+
           ],
         );
       },
@@ -430,234 +442,280 @@ class _PlaywithCompState extends State<PlaywithComp> {
   @override
   Widget build(BuildContext context) {
     String roundResultText = '';
-
-    return Scaffold(
-      backgroundColor: Colors.transparent, // Set the scaffold background color to transparent
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/bg2.jpg'), // Replace 'background_image.jpg' with your image asset
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Expanded(
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
+    print('current suit = $suitToEnable');
+    return WillPopScope(
+      onWillPop: () async {
+        // Show a confirmation dialog when the back button is pressed
+        bool closeGame = await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Close Game?'),
+              content: Text('Do you want to close the game?'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    // If the user chooses to close the game, pop the current route
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Text('Yes'),
                 ),
-                itemCount: throwCards.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      decoration: index < 4 ? BoxDecoration(color: Colors.white) : BoxDecoration(),
-                      child: Center(
-                        child: index == 0 && showPlayer1Card ? Image.asset(
-                          getCardImagePath(throwCards[index]),
-                          width: 200,
-                          height: 150,
-                        ) : index == 1 && showPlayer2Card ? Image.asset(
-                          getCardImagePath(throwCards[index]),
-                          width: 200,
-                          height: 150,
-                        ) : index == 2 && showPlayer3Card ? Image.asset(
-                          getCardImagePath(throwCards[index]),
-                          width: 200,
-                          height: 150,
-                        ) : index == 3 && showPlayer4Card ? Image.asset(
-                          getCardImagePath(throwCards[index]),
-                          width: 200,
-                          height: 150,
-                        ) : Container(), // Show an empty container if the card should be hidden
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            Row( // Row to contain the "Player 1 Cards" text and the PASS button
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                  child: Text(
-                    'Your Cards:',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                  child: ElevatedButton(
-                    onPressed: showPlayer1Card ? () {
-
-                      setState(() {
-                        showPlayer1Card = true;
-                        showPlayer2Card = true;
-                        showPlayer3Card = true;
-                        showPlayer4Card = true;
-
-                        playersArray[0] = false;
-                        playersArray[1] = false;
-                        playersArray[2] = false;
-                        playersArray[3] = false;
-                      });
-                      // Get the selected card from Player 1's hand
-                      PlayingCard selectedCard = throwCards[0];
-
-                      // // Remove the selected card from Player 1's hand
-                      player1.remove(throwCards[0]);
-                      player2.remove(throwCards[1]);
-                      player3.remove(throwCards[2]);
-                      player4.remove(throwCards[3]);
-
-                      throwCards[1] = player2[selectedCard.cardSuit.index] != null && p2_s[selectedCard.cardSuit.index].isNotEmpty ? p2_s[selectedCard.cardSuit.index].removeAt(0) : throwCards[1];
-                      throwCards[2] = player3[selectedCard.cardSuit.index] != null && p3_s[selectedCard.cardSuit.index].isNotEmpty ? p3_s[selectedCard.cardSuit.index].removeAt(0) : throwCards[2];
-                      throwCards[3] = player4[selectedCard.cardSuit.index] != null && p4_s[selectedCard.cardSuit.index].isNotEmpty ? p4_s[selectedCard.cardSuit.index].removeAt(0) : throwCards[3];
-
-                      // Update UI to reflect the changes
-                      setState(() {
-                        // Update throwCards with the selected card from Player 1 and top cards from other players
-                        throwCards[1] = throwCards[1]; // Update the top card with Player 2's card
-                        throwCards[2] = throwCards[2]; // Update Player 2's card with Player 3's card
-                        throwCards[3] = throwCards[3]; // Update Player 3's card with Player 4's card
-                      });
-
-                      // Call the game logic or any other necessary functions
-                      // Here you can call functions like biggerCard() or findSimilarSuitCard() as needed
-                      // For example:
-                      int? highestIndex = biggerCard(throwCards);
-                      int? currentRoundScore = scoreValue(throwCards);
-                      print('CurrentRoundScore = $currentRoundScore');
-                      if (highestIndex==0) {
-                        player1Score+=currentRoundScore;
-                      }
-                      if (highestIndex==1) {
-                        player2Score+=currentRoundScore;
-                      }
-                      if (highestIndex==2) {
-                        player3Score+=currentRoundScore;
-                      }
-                      if (highestIndex==3) {
-                        player4Score+=currentRoundScore;
-                      }
-                      playerScore();
-                      int maxScore = findMaxScore();
-                      print('Maximum score among players: $maxScore');
-
-                      // Call showWinnerDialog() when any of the player's card list becomes empty
-                      if (player1.isEmpty || player2.isEmpty || player3.isEmpty || player4.isEmpty) {
-                        showWinnerDialog();
-                      }
-
-                      print('Rounds completed = $roundscompleted');
-                      if (highestIndex != null) {
-                        // Display the result in an AlertDialog
-                        setState(() {
-                          showCardComparisonDialog(throwCards[highestIndex], highestIndex);
-                          lastRoundWinner = findRoundWinner(highestIndex);
-                          roundscompleted++;
-
-                          // If player 4 wins the round, update throwCards with a random card from player4's array
-                          setState(() {
-                            if (lastRoundWinner == 4) {
-                              throwCards[3] = player4[Random().nextInt(player4.length)];
-                            }
-                            // If player 3 wins the round, update throwCards with a random card from player3's array
-                            if (lastRoundWinner == 3) {
-                              throwCards[2] = player3[Random().nextInt(player3.length)];
-                            }
-                            if (lastRoundWinner == 2) {
-                              throwCards[1] = player2[Random().nextInt(player2.length)];
-                            }
-                          });
-                        });
-                      } else {
-                        print('Check again!!');
-                      }
-                    }: null,
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
-                      padding: EdgeInsets.zero, // No padding around the button
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        'NEXT >>',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ),
-                  ),
+                TextButton(
+                  onPressed: () {
+                    // If the user chooses not to close the game, stay on the same page
+                    Navigator.of(context).pop(false);
+                  },
+                  child: Text('No', style: TextStyle(color: Colors.red)),
                 ),
               ],
+            );
+          },
+        );
+        // Return the user's choice to close the game or not
+        return closeGame ?? false;
+      },
+      child: Scaffold(
+        backgroundColor: Colors.transparent, // Set the scaffold background color to transparent
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/bg2.jpg'), // Replace 'background_image.jpg' with your image asset
+              fit: BoxFit.cover,
             ),
-            Expanded(
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 7,
-                ),
-                itemCount: player1.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      PlayingCard tappedCard = player1[index];
-
-                      print('Cards with Player-1 ${player1.length}');
-                      print('Cards with Player-2 ${player2.length}');
-                      print('Cards with Player-3 ${player3.length}');
-                      print('Cards with Player-4 ${player4.length}');
-
-                      if (!playedround1 || tappedCard.cardSuit == suitToEnable) {
-                        setState(() {
-                          // Update the card played by Player 1
-                          throwCards[0] = tappedCard;
-
-                          // Update suitToEnable if it's the first round
-                          if (!playedround1) {
-                            suitToEnable = tappedCard.cardSuit;
-                          }
-
-                          // Update UI to show the selected card on the top player card
-                          showPlayer1Card = true;
-                        });
-                      } else {
-                        // If it's not the first round and the selected card's suit is not the same as the suitToEnable, prevent the player from selecting a card
-                        // Optionally, you can show a message or disable interaction here
-                      }
-                    },
-                    child: Padding(
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Expanded(
+                child: GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                  ),
+                  itemCount: throwCards.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
+                      child: Stack(
+                        children: [
+                          // Background image
+                          Container(
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage('assets/cards_images/back_light.png'),
+                                fit: BoxFit.cover,
+                              ),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          // Overlay for the selected card's container
+                          if ((index == 0 && showPlayer1Card) ||
+                              (index == 1 && showPlayer2Card) ||
+                              (index == 2 && showPlayer3Card) ||
+                              (index == 3 && showPlayer4Card))
+                            Container(
+                              color: Colors.white, // Color overlay
+                              width: double.infinity,
+                              height: double.infinity,
+                              child: Center(
+                                child: Image.asset(
+                                  getCardImagePath(throwCards[index]),
+                                  width: 200,
+                                  height: 150,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+
+              ),
+              Row( // Row to contain the "Player 1 Cards" text and the PASS button
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    child: Text(
+                      'Your Cards:',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                    child: ElevatedButton(
+                      onPressed: showPlayer1Card ? () {
+
+                        setState(() {
+                          showPlayer1Card = true;
+                          showPlayer2Card = true;
+                          showPlayer3Card = true;
+                          showPlayer4Card = true;
+
+                          playersArray[0] = false;
+                          playersArray[1] = false;
+                          playersArray[2] = false;
+                          playersArray[3] = false;
+                        });
+                        // Get the selected card from Player 1's hand
+                        PlayingCard selectedCard = throwCards[0];
+
+                        // // Remove the selected card from Player 1's hand
+                        player1.remove(throwCards[0]);
+                        player2.remove(throwCards[1]);
+                        player3.remove(throwCards[2]);
+                        player4.remove(throwCards[3]);
+
+                        throwCards[1] = player2[selectedCard.cardSuit.index] != null && p2_s[selectedCard.cardSuit.index].isNotEmpty ? p2_s[selectedCard.cardSuit.index].removeAt(0) : throwCards[1];
+                        throwCards[2] = player3[selectedCard.cardSuit.index] != null && p3_s[selectedCard.cardSuit.index].isNotEmpty ? p3_s[selectedCard.cardSuit.index].removeAt(0) : throwCards[2];
+                        throwCards[3] = player4[selectedCard.cardSuit.index] != null && p4_s[selectedCard.cardSuit.index].isNotEmpty ? p4_s[selectedCard.cardSuit.index].removeAt(0) : throwCards[3];
+
+                        // Update UI to reflect the changes
+                        setState(() {
+                          // Update throwCards with the selected card from Player 1 and top cards from other players
+                          throwCards[1] = throwCards[1]; // Update the top card with Player 2's card
+                          throwCards[2] = throwCards[2]; // Update Player 2's card with Player 3's card
+                          throwCards[3] = throwCards[3]; // Update Player 3's card with Player 4's card
+                        });
+
+                        // Call the game logic or any other necessary functions
+                        // Here you can call functions like biggerCard() or findSimilarSuitCard() as needed
+                        // For example:
+                        int? highestIndex = biggerCard(throwCards);
+                        int? currentRoundScore = scoreValue(throwCards);
+                        print('CurrentRoundScore = $currentRoundScore');
+                        if (highestIndex==0) {
+                          player1Score+=currentRoundScore;
+                        }
+                        if (highestIndex==1) {
+                          player2Score+=currentRoundScore;
+                        }
+                        if (highestIndex==2) {
+                          player3Score+=currentRoundScore;
+                        }
+                        if (highestIndex==3) {
+                          player4Score+=currentRoundScore;
+                        }
+                        playerScore();
+                        int maxScore = findMaxScore();
+                        print('Maximum score among players: $maxScore');
+
+                        // Call showWinnerDialog() when any of the player's card list becomes empty
+                        if (player1.isEmpty || player2.isEmpty || player3.isEmpty || player4.isEmpty) {
+                          showWinnerDialog();
+                        }
+
+                        print('Rounds completed = $roundscompleted');
+                        if (highestIndex != null) {
+                          // Display the result in an AlertDialog
+                          setState(() {
+                            showCardComparisonDialog(throwCards[highestIndex], highestIndex);
+                            lastRoundWinner = findRoundWinner(highestIndex);
+                            roundscompleted++;
+
+                            // If player 4 wins the round, update throwCards with a random card from player4's array
+                            setState(() {
+                              if (lastRoundWinner == 4) {
+                                throwCards[3] = player4[Random().nextInt(player4.length)];
+                                suitenabler(3);
+                              }
+                              // If player 3 wins the round, update throwCards with a random card from player3's array
+                              if (lastRoundWinner == 3) {
+                                throwCards[2] = player3[Random().nextInt(player3.length)];
+                                suitenabler(2);
+                              }
+                              if (lastRoundWinner == 2) {
+                                throwCards[1] = player2[Random().nextInt(player2.length)];
+                                suitenabler(1);
+                              }
+
+                            });
+                          });
+                        } else {
+                          print('Check again!!');
+                        }
+                      }: null,
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.white,
+                        padding: EdgeInsets.zero, // No padding around the button
+                        shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
-                        child: Center(
-                          child: Image.asset(
-                            getCardImagePath(player1[index]),
-                            width: 100,
-                            height: 100,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'NEXT >>',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
                           ),
                         ),
                       ),
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
-            ),
-          ],
+              Expanded(
+                child: GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 7,
+                  ),
+                  itemCount: player1.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        PlayingCard tappedCard = player1[index];
+
+                        print('Cards with Player-1 ${player1.length}');
+                        print('Cards with Player-2 ${player2.length}');
+                        print('Cards with Player-3 ${player3.length}');
+                        print('Cards with Player-4 ${player4.length}');
+
+                        if (!playedround1 || tappedCard.cardSuit == suitToEnable) {
+                          setState(() {
+                            // Update the card played by Player 1
+                            throwCards[0] = tappedCard;
+
+                            // Update suitToEnable if it's the first round
+                            if (!playedround1) {
+                              suitToEnable = tappedCard.cardSuit;
+                            }
+
+                            // Update UI to show the selected card on the top player card
+                            showPlayer1Card = true;
+                          });
+                        } else {
+                          // If it's not the first round and the selected card's suit is not the same as the suitToEnable, prevent the player from selecting a card
+                          // Optionally, you can show a message or disable interaction here
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Center(
+                            child: Image.asset(
+                              getCardImagePath(player1[index]),
+                              width: 100,
+                              height: 100,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
