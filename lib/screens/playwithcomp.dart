@@ -28,6 +28,7 @@ class _PlaywithCompState extends State<PlaywithComp> {
   List eachRoundScore = [];
   int lastRoundWinner = 0;
   int roundscompleted = 0;
+  bool suitSelectionDialogShown = false;
 
   // Boolean variables to determine whether to show or hide the top card for each player
   bool showPlayer1Card = false;
@@ -40,6 +41,7 @@ class _PlaywithCompState extends State<PlaywithComp> {
 
   // Define suitToEnable variable to store the suit of the first card played
   CardSuit suitToEnable = CardSuit.spades;
+  bool suitToEnableany = false;
 
   @override
   void initState() {
@@ -54,7 +56,7 @@ class _PlaywithCompState extends State<PlaywithComp> {
     distributeCards();
 
     // Set the suitToEnable variable to the suit of the first card played
-    suitToEnable = throwCards[0].cardSuit;
+    //suitToEnable = throwCards[0].cardSuit;
   }
 
   String getCardImagePath(PlayingCard card) {
@@ -277,7 +279,7 @@ class _PlaywithCompState extends State<PlaywithComp> {
     );
 
     // Start a timer to dismiss the dialog after 1 second
-    Timer(Duration(seconds: 1), () {
+    Timer(Duration(seconds: 2), () {
       // Close the dialog
       Navigator.of(context).pop();
 
@@ -313,9 +315,6 @@ class _PlaywithCompState extends State<PlaywithComp> {
       }
     });
   }
-
-
-
 
   // Function to find the winner of the current round
   int findRoundWinner(int playerIndex) {
@@ -420,7 +419,7 @@ class _PlaywithCompState extends State<PlaywithComp> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Game Over'),
-          content: Text('The winner is $winner with a score of $maxScore.'),
+          content: Text('The winner is $winner with a score of $maxScore.\nPlayer 1 Score: $player1Score\nPlayer 2 Score: $player2Score\nPlayer 3 Score: $player3Score\nPlayer 4 Score: $player4Score\n'),
           actions: [
             TextButton(
               onPressed: () {
@@ -439,10 +438,136 @@ class _PlaywithCompState extends State<PlaywithComp> {
     );
   }
 
+  void showSuitSelectionDialog() {
+    // Delay the dialog display until the next frame
+    Future.delayed(Duration.zero, () {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return AlertDialog(
+                title: Text('Select Starting Suit'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Spades
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              suitToEnable = CardSuit.spades;
+                            });
+                          },
+                          child: Image.asset(
+                            'assets/spades.png',
+                            width: 50,
+                            height: 50,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              suitToEnable = CardSuit.diamonds;
+                            });
+                          },
+                          child: Image.asset(
+                            'assets/diamonds.png',
+                            width: 50,
+                            height: 50,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              suitToEnable = CardSuit.clubs;
+                            });
+                          },
+                          child: Image.asset(
+                            'assets/clubs.png',
+                            width: 50,
+                            height: 50,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              suitToEnable = CardSuit.hearts;
+                            });
+                          },
+                          child: Image.asset(
+                            'assets/hearts.png',
+                            width: 50,
+                            height: 50,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Text('Selected Suit: ${suitToEnable.toString().split('.').last.toUpperCase()}\n YOU ARE PLAYER 1'),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      //print('after ok = $suitToEnable');
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
+    });
+  }
+
+  // Function to remove the selectedCard from the nested list
+  void removeCardFromNestedList(List<List<dynamic>> nestedList, var cardToRemove) {
+    for (var sublist in nestedList) {
+      sublist.removeWhere((card) => card == cardToRemove);
+      print('removed!!!!');
+    }
+  }
+
+  // Function to find the index of a given suit in the nested list
+  void findSuitAvailability(CardSuit suit, List<List<dynamic>> nestedList) {
+    print('findSuitAvailability');
+    //int emptycnt = 0;
+    //suitToEnableany = true;
+    for (int i = 0; i < nestedList.length; i++) {
+      // int j=0;
+      // for (int j=0; j<nestedList[i].length; j++) {
+      //   if(nestedList[i][j].cardSuit == suitToEnable) {
+      //     suitToEnableany = false;
+      //   }
+      // }
+      if (nestedList[i].isEmpty) {
+        suitToEnableany = true;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     String roundResultText = '';
     print('current suit = $suitToEnable');
+
+    setState(() {
+      if (!suitSelectionDialogShown && roundscompleted==0) {
+        // Show the suit selection dialog
+        showSuitSelectionDialog();
+
+        // Update the variable to indicate that the dialog has been shown
+        suitSelectionDialogShown = true;
+      }
+    });
+
+
     return WillPopScope(
       onWillPop: () async {
         // Show a confirmation dialog when the back button is pressed
@@ -549,7 +674,6 @@ class _PlaywithCompState extends State<PlaywithComp> {
                     padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
                     child: ElevatedButton(
                       onPressed: showPlayer1Card ? () {
-
                         setState(() {
                           showPlayer1Card = true;
                           showPlayer2Card = true;
@@ -569,6 +693,10 @@ class _PlaywithCompState extends State<PlaywithComp> {
                         player2.remove(throwCards[1]);
                         player3.remove(throwCards[2]);
                         player4.remove(throwCards[3]);
+
+                        // Remove the card from p1_s
+                        removeCardFromNestedList(p1_s, selectedCard);
+                        print('p1 length = ${p1_s.length}');
 
                         throwCards[1] = player2[selectedCard.cardSuit.index] != null && p2_s[selectedCard.cardSuit.index].isNotEmpty ? p2_s[selectedCard.cardSuit.index].removeAt(0) : throwCards[1];
                         throwCards[2] = player3[selectedCard.cardSuit.index] != null && p3_s[selectedCard.cardSuit.index].isNotEmpty ? p3_s[selectedCard.cardSuit.index].removeAt(0) : throwCards[2];
@@ -632,13 +760,22 @@ class _PlaywithCompState extends State<PlaywithComp> {
                                 throwCards[1] = player2[Random().nextInt(player2.length)];
                                 suitenabler(1);
                               }
-
+                              printSegregatedAndSortedCards(p1_s, 'Player 1');
                             });
                           });
                         } else {
                           print('Check again!!');
                         }
-                      }: null,
+
+                        print('winner of last round = $lastRoundWinner');
+                        suitToEnableany = false;
+                        if (lastRoundWinner==1) {
+                          //suitToEnable = CardSuit.clubs;
+                          suitToEnableany = true;
+                        }
+
+                        findSuitAvailability(suitToEnable, p1_s);
+                      } : null,
                       style: ElevatedButton.styleFrom(
                         primary: Colors.white,
                         padding: EdgeInsets.zero, // No padding around the button
@@ -669,29 +806,28 @@ class _PlaywithCompState extends State<PlaywithComp> {
                   itemBuilder: (context, index) {
                     return GestureDetector(
                       onTap: () {
-                        PlayingCard tappedCard = player1[index];
-
-                        print('Cards with Player-1 ${player1.length}');
-                        print('Cards with Player-2 ${player2.length}');
-                        print('Cards with Player-3 ${player3.length}');
-                        print('Cards with Player-4 ${player4.length}');
-
-                        if (!playedround1 || tappedCard.cardSuit == suitToEnable) {
+                        // Check if the card's suit matches the one to enable
+                        if (player1[index].cardSuit != suitToEnable && !suitToEnableany) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('You can play only ${suitToEnable.toString().split('.').last.toUpperCase()}'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                          print('Card suit does not match suitToEnable. Tap ignored. $suitToEnable');
+                        } else {
                           setState(() {
                             // Update the card played by Player 1
-                            throwCards[0] = tappedCard;
+                            throwCards[0] = player1[index];
 
                             // Update suitToEnable if it's the first round
                             if (!playedround1) {
-                              suitToEnable = tappedCard.cardSuit;
+                              suitToEnable = player1[index].cardSuit;
                             }
 
                             // Update UI to show the selected card on the top player card
                             showPlayer1Card = true;
                           });
-                        } else {
-                          // If it's not the first round and the selected card's suit is not the same as the suitToEnable, prevent the player from selecting a card
-                          // Optionally, you can show a message or disable interaction here
                         }
                       },
                       child: Padding(

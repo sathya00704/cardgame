@@ -85,6 +85,7 @@ class _HomeState extends State<Home> {
                             context,
                             MaterialPageRoute(builder: (context) => PlaywithComp()),
                           );
+                          //showSuitSelectionDialog,
                         },
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.green[800], elevation: 10),
                         child: Text(
@@ -185,6 +186,12 @@ class _HomeState extends State<Home> {
                                         onPressed: () {
                                           // Handle language settings
                                           Navigator.of(context).pop();
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('We are currently working on it! Thanks for your patience!'),
+                                              duration: Duration(seconds: 3),
+                                            ),
+                                          );
                                         },
                                         icon: Icon(Icons.volume_up_outlined),
                                         label: Text('Sound'),
@@ -193,6 +200,12 @@ class _HomeState extends State<Home> {
                                         onPressed: () {
                                           // Handle notifications settings
                                           Navigator.of(context).pop();
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('We are currently working on it! Thanks for your patience!'),
+                                              duration: Duration(seconds: 3),
+                                            ),
+                                          );
                                         },
                                         icon: Icon(Icons.notifications),
                                         label: Text('Notifications'),
@@ -265,6 +278,34 @@ class _HomeState extends State<Home> {
                           mini: true,
                           backgroundColor: Colors.black,
                           child: Icon(Icons.star_border, size: 40, color: Colors.white),
+                        ),
+                        SizedBox(height: 20),
+                        FloatingActionButton(
+                          onPressed: ()  {
+                            print('Report Bug');
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Report a Bug'),
+                                  content: Container(
+                                    constraints: BoxConstraints(maxHeight: 400),
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text('Email me at sathyanarayanan.s744@gmail.com'),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                          mini: true,
+                          backgroundColor: Colors.black,
+                          child: Icon(Icons.report, size: 30, color: Colors.white),
                         ),
                       ],
                     ),
