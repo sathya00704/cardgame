@@ -2,7 +2,7 @@ Game Working & Explanation along with screenshots:
 Home screen:
 The home screen of the app is decorated with a background image and has 2 buttons: PLAY WITH COMPUTER & PLAY WITH FRIENDS
 It has 5 other buttons - Win/loss, Report a Bug, Profile, Settings & Cart
-
+![WhatsApp Image 2024-09-02 at 01 29 23_b16d7dd9](https://github.com/user-attachments/assets/0d06b679-3c47-4492-8221-6e1623e7be2e)
 
 
 
